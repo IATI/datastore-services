@@ -1,0 +1,17 @@
+{
+    "bindings": [
+        {
+            "authLevel": "Function",
+            "type": "HttpTrigger",
+            "direction": "in",
+            "name": "req",
+            "methods": ["post"],
+            "route": "pvt/solr/create-collections"
+        },
+        {
+            "type": "http",
+            "direction": "out",
+            "name": "res"
+        }
+    ]
+}

@@ -110,6 +110,43 @@ let myEnvVariable = config.ENV_VAR
 
 204 Response
 
+### `POST /pvt/solr/create-collections`
+
+Creates new collections named `collection.name_newVersion`, aliases to `collection.alias`
+
+-   Request
+
+```json
+{
+  "newVersion": "4",
+  "collections": [
+    {
+      "name": "activity",
+      "config": {
+        "collection.configName": "activity_configset_4",
+        "numShards": 1,
+        "replicationFactor": 3
+      },
+      "alias": "activity_solrize"
+    },
+    {
+      "name": "budget",
+      "config": {
+        "collection.configName": "budget_configset_4",
+        "numShards": 1,
+        "replicationFactor": 3
+      },
+      "alias": "budget_solrize"
+    }
+    ...
+  ]
+}
+```
+
+-   Returns
+
+204 Response
+
 ## Creating a new route
 
 `func new --name <routename> --template "HTTP trigger" --authlevel "Function"`
