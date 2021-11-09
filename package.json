@@ -1,7 +1,7 @@
 {
-    "name": "azure-function-node-microservice-template",
+    "name": "datastore-services",
     "version": "0.0.0",
-    "description": "",
+    "description": "Datastore utility endpoints",
     "scripts": {
         "start": "func start --javascript",
         "start:verbose": "func start --javascript --verbose",
@@ -12,7 +12,8 @@
     "dependencies": {
         "applicationinsights": "^2.1.8",
         "dotenv": "^10.0.0",
-        "redis": "^3.1.2"
+        "node-fetch": "^2.6.6",
+        "pg": "^8.7.1"
     },
     "devDependencies": {
         "@prettier/plugin-xml": "^1.1.0",

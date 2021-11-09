@@ -36,4 +36,29 @@ module.exports = {
 
         return result;
     },
+
+    clearSolrForAll: async () => {
+        const pool = new Pool(config.PGCONFIG);
+        const client = await pool.connect();
+
+        try {
+            await client.query('BEGIN');
+            const sql = `
+                UPDATE document
+                SET 
+                    solrize_start = Null,
+                    solrize_end = Null,
+                    solr_api_error = Null
+                `;
+            await client.query(sql);
+            await client.query('COMMIT');
+            return;
+        } catch (e) {
+            await client.query('ROLLBACK');
+            throw e;
+        } finally {
+            client.release();
+            await pool.end();
+        }
+    },
 };

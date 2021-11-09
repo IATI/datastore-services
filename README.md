@@ -104,6 +104,12 @@ let myEnvVariable = config.ENV_VAR
 
 204 Response
 
+### `PATCH /pvt/db/clear-solr/all`
+
+-   Returns
+
+204 Response
+
 ## Creating a new route
 
 `func new --name <routename> --template "HTTP trigger" --authlevel "Function"`

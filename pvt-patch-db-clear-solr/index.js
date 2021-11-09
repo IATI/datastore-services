@@ -1,6 +1,6 @@
 const db = require('../database/db');
 
-module.exports = async function (context, req) {
+module.exports = async (context, req) => {
     try {
         const { body } = req;
 
@@ -49,7 +49,7 @@ module.exports = async function (context, req) {
         context.res = {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(e),
+            body: JSON.stringify(e.message),
         };
     }
 };

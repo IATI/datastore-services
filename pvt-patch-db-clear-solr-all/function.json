@@ -1,0 +1,17 @@
+{
+    "bindings": [
+        {
+            "authLevel": "Function",
+            "type": "HttpTrigger",
+            "direction": "in",
+            "name": "req",
+            "methods": ["patch"],
+            "route": "pvt/db/clear-solr/all"
+        },
+        {
+            "type": "http",
+            "direction": "out",
+            "name": "res"
+        }
+    ]
+}
