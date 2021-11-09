@@ -114,7 +114,7 @@ Hello, <Name>. This HTTP triggered function executed successfully.
 
 ## Creating a new route
 
-`func new --name <routename> --template "HTTP trigger" --authlevel "anonymous"`
+`func new --name <routename> --template "HTTP trigger" --authlevel "Function"`
 
 ## AppInsights SDK
 
