@@ -92,29 +92,21 @@ let myEnvVariable = config.ENV_VAR
 <0.0.0>
 ```
 
-### `GET /pvt?name=Name`
+### `PATCH /pvt/db/clear-solr`
+
+-   Request
+
+```json
+{ "ids": ["74790f8d-29f7-4bda-afa9-b46070dfc276", "547d7d97-9330-4938-bc4b-f64c3844be23"] }
+```
 
 -   Returns
 
-```
-Private API.
-Version <0.0.0>
-Hello, <Name>. This HTTP triggered function executed successfully.
-```
-
-### `GET /pub?name=Name`
-
--   Returns
-
-```
-Public API.
-Version <0.0.0>
-Hello, <Name>. This HTTP triggered function executed successfully.
-```
+204 Response
 
 ## Creating a new route
 
-`func new --name <routename> --template "HTTP trigger" --authlevel "anonymous"`
+`func new --name <routename> --template "HTTP trigger" --authlevel "Function"`
 
 ## AppInsights SDK
 
