@@ -143,6 +143,8 @@ Creates new collections named `collection.name_newVersion`, aliases to `collecti
 }
 ```
 
+Also see [exampleRequest.json](./pvt-post-solr-create-collections/exampleRequest.json)
+
 -   Returns
 
 204 Response

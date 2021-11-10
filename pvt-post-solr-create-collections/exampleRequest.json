@@ -1,0 +1,32 @@
+{
+    "newVersion": "X",
+    "collections": [
+        {
+            "name": "activity",
+            "config": {
+                "collection.configName": "activity_configset_X",
+                "numShards": 1,
+                "replicationFactor": 3
+            },
+            "alias": "activity_solrize"
+        },
+        {
+            "name": "budget",
+            "config": {
+                "collection.configName": "budget_configset_X",
+                "numShards": 1,
+                "replicationFactor": 3
+            },
+            "alias": "budget_solrize"
+        },
+        {
+            "name": "transaction",
+            "config": {
+                "collection.configName": "transaction_configset_X",
+                "numShards": 1,
+                "replicationFactor": 3
+            },
+            "alias": "transaction_solrize"
+        }
+    ]
+}
