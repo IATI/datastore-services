@@ -23,8 +23,6 @@ module.exports = async (context, req) => {
                     headers: { 'Content-Type': 'application/json' },
                     body: { error: `Body must contain a key "${key}"` },
                 };
-
-                
             }
         });
 
@@ -60,10 +58,22 @@ module.exports = async (context, req) => {
         return;
     } catch (e) {
         context.log(e);
+        const body = {};
+        body.message = e.message;
+        if (e.code === 'HTTP_ERROR') {
+            body.requestUrl = e.response.url;
+            const contentType = await e.response.headers.get('content-type');
+            if (contentType.includes('text/html')) {
+                body.response = await e.response.text();
+            }
+            if (contentType.includes('application/json')) {
+                body.response = await e.response.json();
+            }
+        }
         context.res = {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(e.message),
+            body,
         };
     }
 };
