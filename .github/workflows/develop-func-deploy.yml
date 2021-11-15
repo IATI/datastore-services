@@ -79,7 +79,7 @@ jobs:
             ]
 
       - name: 'Login via Azure CLI'
-        uses: azure/login@v1.4.0
+        uses: azure/login@v1.4.1
         with:
           creds: ${{ secrets.DEV_AZURE_CREDENTIALS }} # Service Principal credentials saved in GitHub Secrets
 
