@@ -1,29 +1,25 @@
-name: Deploy_To_Dev_Function_On_Push
+name: Deploy_To_PROD_Function_On_Release
 
+# Runs when a Release is published from GitHub UI
 on:
-  push:
-    paths-ignore: # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
-      - '**/README.md' # don't run on README.md file updates anywhere in repo
-      - '**/dependabot.yml'
-      - '.github/workflows/prod-func-deploy.yml'
-    branches:
-      - develop # update with develop when ready to deploy to Azure
+  release:
+    types: [published]
 
 env:
-  STAGE: dev # suffix to indicate environment stage
+  STAGE: prod # suffix to indicate environment stage
   NAME: func-datastore-services
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '14.x' # set this to the node version to use
-  AZURE_CREDENTIALS: ${{ secrets.DEV_AZURE_CREDENTIALS }}
-  PGDATABASE: ${{ secrets.PGDATABASE_DEV }}
-  PGHOST: ${{ secrets.PGHOST_DEV }}
-  PGUSER: ${{ secrets.PGUSER_DEV }}
-  PGPASSWORD: ${{ secrets.PGPASSWORD_DEV }}
+  AZURE_CREDENTIALS: ${{ secrets.PROD_AZURE_CREDENTIALS }}
+  PGDATABASE: ${{ secrets.PGDATABASE_PROD }}
+  PGHOST: ${{ secrets.PGHOST_PROD }}
+  PGUSER: ${{ secrets.PGUSER_PROD }}
+  PGPASSWORD: ${{ secrets.PGPASSWORD_PROD }}
   PGPORT: ${{ secrets.PGPORT }}
   PGSSL: ${{ secrets.PGSSL }}
-  SOLR_URL: ${{ secrets.DEV_SOLR_API_URL }}
-  SOLR_USERNAME: ${{ secrets.DEV_SOLR_USER }}
-  SOLR_PASSWORD: ${{secrets.DEV_SOLR_PASSWORD }}
+  SOLR_URL: ${{ secrets.PROD_SOLR_API_URL }}
+  SOLR_USERNAME: ${{ secrets.PROD_SOLR_USER }}
+  SOLR_PASSWORD: ${{secrets.PROD_SOLR_PASSWORD }}
 
 jobs:
   build-deploy:
