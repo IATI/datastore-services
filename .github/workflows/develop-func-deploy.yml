@@ -113,11 +113,6 @@ jobs:
                     "name": "AzureWebJobsSecretStorageType",
                     "value": "keyvault",
                     "slotSetting": false
-                },
-                {
-                    "name": "AzureWebJobsSecretStorageKeyVaultName",
-                    "value": "${{ env.KV_NAME }}",
-                    "slotSetting": false
                 }
             ]
 
