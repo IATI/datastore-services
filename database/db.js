@@ -61,4 +61,49 @@ module.exports = {
             await pool.end();
         }
     },
+
+    clearFlattenerForIds: async (ids) => {
+        const sql = `
+        UPDATE document
+        SET 
+            flatten_api_error = Null,
+            flatten_end = Null,
+            flatten_start = Null,
+            flattened_activities = Null
+        WHERE
+            id = ANY($1);
+        `;
+
+        const result = await module.exports.query(sql, [ids]);
+
+        return result;
+    },
+
+    clearFlattenerForAll: async () => {
+        const pool = new Pool(config.PGCONFIG);
+        const client = await pool.connect();
+
+        try {
+            await client.query('BEGIN');
+            const sql = `
+                UPDATE document
+                SET 
+                    flatten_api_error = Null,
+                    flatten_end = Null,
+                    flatten_start = Null,
+                    flattened_activities = Null
+                WHERE 
+                    flatten_end is not Null and downloaded is not Null
+                `;
+            await client.query(sql);
+            await client.query('COMMIT');
+            return;
+        } catch (e) {
+            await client.query('ROLLBACK');
+            throw e;
+        } finally {
+            client.release();
+            await pool.end();
+        }
+    },
 };

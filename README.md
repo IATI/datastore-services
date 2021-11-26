@@ -110,6 +110,24 @@ let myEnvVariable = config.ENV_VAR
 
 204 Response
 
+### `PATCH /pvt/db/clear-flattener`
+
+-   Request
+
+```json
+{ "ids": ["74790f8d-29f7-4bda-afa9-b46070dfc276", "547d7d97-9330-4938-bc4b-f64c3844be23"] }
+```
+
+-   Returns
+
+204 Response
+
+### `PATCH /pvt/db/clear-flattener/all`
+
+-   Returns
+
+204 Response
+
 ### `POST /pvt/solr/create-collections`
 
 Creates new collections named `collection.name_newVersion`, aliases to `collection.alias`
