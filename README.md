@@ -143,7 +143,7 @@ Creates new collections named `collection.name_newVersion`, aliases to `collecti
       "config": {
         "collection.configName": "activity_configset_4",
         "numShards": 1,
-        "replicationFactor": 3
+        "replicationFactor": 1
       },
       "alias": "activity_solrize"
     },
@@ -152,7 +152,7 @@ Creates new collections named `collection.name_newVersion`, aliases to `collecti
       "config": {
         "collection.configName": "budget_configset_4",
         "numShards": 1,
-        "replicationFactor": 3
+        "replicationFactor": 1
       },
       "alias": "budget_solrize"
     }

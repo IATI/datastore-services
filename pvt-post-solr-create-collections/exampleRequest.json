@@ -6,7 +6,7 @@
             "config": {
                 "collection.configName": "activity_configset_X",
                 "numShards": 1,
-                "replicationFactor": 3
+                "replicationFactor": 1
             },
             "alias": "activity_solrize"
         },
@@ -15,7 +15,7 @@
             "config": {
                 "collection.configName": "budget_configset_X",
                 "numShards": 1,
-                "replicationFactor": 3
+                "replicationFactor": 1
             },
             "alias": "budget_solrize"
         },
@@ -24,7 +24,7 @@
             "config": {
                 "collection.configName": "transaction_configset_X",
                 "numShards": 1,
-                "replicationFactor": 3
+                "replicationFactor": 1
             },
             "alias": "transaction_solrize"
         }
