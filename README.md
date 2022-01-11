@@ -1,4 +1,4 @@
-# azure-function-node-microservice-template
+# datastore-services
 
 ## Prerequisities
 
