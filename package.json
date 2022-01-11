@@ -11,7 +11,7 @@
     "author": "IATI",
     "dependencies": {
         "applicationinsights": "^2.2.0",
-        "dotenv": "^10.0.0",
+        "dotenv": "^11.0.0",
         "node-fetch": "^2.6.6",
         "pg": "^8.7.1"
     },
