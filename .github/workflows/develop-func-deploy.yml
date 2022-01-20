@@ -24,7 +24,9 @@ env:
   PGSSL: ${{ secrets.PGSSL }}
   SOLR_URL: ${{ secrets.DEV_SOLR_API_URL }}
   SOLR_USERNAME: ${{ secrets.DEV_SOLR_USER }}
-  SOLR_PASSWORD: ${{secrets.DEV_SOLR_PASSWORD }}
+  SOLR_PASSWORD: ${{ secrets.DEV_SOLR_PASSWORD }}
+  STORAGE_CONNECTION_STRING: ${{ secrets.DEV_STORAGE_CONNECTION_STRING }}
+  DOWNLOAD_CONTAINER_NAME: ${{ secrets.DEV_DOWNLOAD_CONTAINER_NAME }}
 
 jobs:
   build-deploy:
@@ -102,6 +104,16 @@ jobs:
                 {
                     "name": "SOLR_PASSWORD",
                     "value": "${{ env.SOLR_PASSWORD }}",
+                    "slotSetting": false
+                },
+                {
+                    "name": "STORAGE_CONNECTION_STRING",
+                    "value": "${{ env.STORAGE_CONNECTION_STRING }}",
+                    "slotSetting": false
+                },
+                {
+                    "name": "DOWNLOAD_CONTAINER_NAME",
+                    "value": "${{ env.DOWNLOAD_CONTAINER_NAME }}",
                     "slotSetting": false
                 }
             ]
