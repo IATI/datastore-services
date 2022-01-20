@@ -37,22 +37,21 @@ module.exports = {
         checkRespStatus(response);
     },
 
-    query: async (query, format = 'JSON', docsOnly = false) => {
-        let fullQuery = query;
+    query: async (url, format = 'JSON', docsOnly = false, stream = false) => {
         switch (format) {
             case 'CSV':
-                fullQuery += '&wt=csv';
+                url.searchParams.set('wt', 'csv');
                 break;
             case 'JSON':
-                fullQuery += '&wt=json';
+                url.searchParams.set('wt', 'json');
                 break;
             case 'XML':
-                fullQuery += '&fl=iati_xml';
+                url.searchParams.set('fl', 'iati_xml');
                 break;
             default:
                 break;
         }
-        const response = await fetch(`${config.SOLRCONFIG.url}${fullQuery}`, {
+        const response = await fetch(url, {
             headers: {
                 Authorization: `Basic ${Buffer.from(
                     `${config.SOLRCONFIG.user}:${config.SOLRCONFIG.password}`,
@@ -61,6 +60,10 @@ module.exports = {
             },
         });
         checkRespStatus(response);
+
+        if (stream) {
+            return response.body;
+        }
         let body;
 
         if (format === 'CSV') {
@@ -73,33 +76,5 @@ module.exports = {
         }
 
         return body;
-    },
-
-    queryStream: async (query, format = 'JSON') => {
-        let fullQuery = query;
-        switch (format) {
-            case 'CSV':
-                fullQuery += '&wt=csv';
-                break;
-            case 'JSON':
-                fullQuery += '&wt=json';
-                break;
-            case 'XML':
-                fullQuery = fullQuery.replace('/select', '/iati');
-                break;
-            default:
-                break;
-        }
-        const response = await fetch(`${config.SOLRCONFIG.url}${fullQuery}`, {
-            headers: {
-                Authorization: `Basic ${Buffer.from(
-                    `${config.SOLRCONFIG.user}:${config.SOLRCONFIG.password}`,
-                    'binary'
-                ).toString('base64')}`,
-            },
-        });
-        checkRespStatus(response);
-
-        return response.body;
     },
 };

@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const { BlobServiceClient } = require('@azure/storage-blob');
 const { PassThrough } = require('stream');
-const { query, queryStream } = require('../solr/solr');
+const { query } = require('../solr/solr');
 const config = require('../config/config');
 
 const contentTypeMap = {
@@ -58,8 +58,10 @@ module.exports = async (context, req) => {
             return;
         }
 
+        const metaURL = new URL(config.SOLRCONFIG.url + body.query);
+        metaURL.searchParams.set('rows', 0);
         // query solr to get response info (not results yet)
-        const { response: solrResponseMeta } = await query(`${body.query}&rows=0`);
+        const { response: solrResponseMeta } = await query(metaURL);
 
         // upload to blob
         const blobServiceClient = BlobServiceClient.fromConnectionString(
@@ -76,6 +78,12 @@ module.exports = async (context, req) => {
         const { numFound } = solrResponseMeta;
         const uploadOptions = { bufferSize: 4 * config.ONE_MEGABYTE, maxBuffers: 20 };
         let uploadResponse;
+        const queryUrl = new URL(config.SOLRCONFIG.url + body.query);
+
+        // add sort if not present
+        if (!queryUrl.searchParams.has('sort')) {
+            queryUrl.searchParams.set('sort', 'id desc');
+        }
 
         if (body.format === 'XML') {
             let start = 0;
@@ -87,6 +95,8 @@ module.exports = async (context, req) => {
 
             uploadStream.write(header);
 
+            queryUrl.searchParams.set('rows', config.SOLR_MAX_ROWS);
+
             do {
                 context.log(
                     `Downloading ${start}-${
@@ -95,12 +105,9 @@ module.exports = async (context, req) => {
                             : numFound
                     } rows of total: ${numFound}`
                 );
+                queryUrl.searchParams.set('start', start);
                 // eslint-disable-next-line no-await-in-loop
-                const formattedResponse = await query(
-                    `${body.query}&start=${start}&rows=${config.SOLR_MAX_ROWS}`,
-                    body.format,
-                    true
-                );
+                const formattedResponse = await query(queryUrl, body.format, true);
 
                 formattedResponse.forEach((doc) => {
                     uploadStream.write(doc.iati_xml);
@@ -119,8 +126,9 @@ module.exports = async (context, req) => {
                 { blobHTTPHeaders: { blobContentType: contentTypeMap[body.format] } }
             );
         } else {
-            const fullResponse = await queryStream(`${body.query}&rows=${numFound}`, body.format);
-
+            queryUrl.searchParams.set('rows', numFound);
+            const fullResponse = await query(queryUrl, body.format, false, true);
+            context.log('Streaming query from Solr to Blob');
             uploadResponse = await blockBlobClient.uploadStream(
                 fullResponse,
                 uploadOptions.bufferSize,
@@ -129,7 +137,7 @@ module.exports = async (context, req) => {
             );
         }
 
-        context.log(`Blob upload complete requestId: ${uploadResponse.requestId}`);
+        context.log(`Blob upload complete. requestId: ${uploadResponse.requestId}`);
 
         context.res = {
             headers: { 'Content-Type': 'application/json' },
