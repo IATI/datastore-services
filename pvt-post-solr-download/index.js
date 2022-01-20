@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const { BlobServiceClient } = require('@azure/storage-blob');
 const { PassThrough } = require('stream');
-const { query } = require('../solr/solr');
+const { query, queryStream } = require('../solr/solr');
 const config = require('../config/config');
 
 const contentTypeMap = {
@@ -74,6 +74,8 @@ module.exports = async (context, req) => {
         const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
         const { numFound } = solrResponseMeta;
+        const uploadOptions = { bufferSize: 4 * config.ONE_MEGABYTE, maxBuffers: 20 };
+        let uploadResponse;
 
         if (body.format === 'XML') {
             let start = 0;
@@ -110,21 +112,33 @@ module.exports = async (context, req) => {
             uploadStream.write(footer);
             uploadStream.end();
 
-            const uploadOptions = { bufferSize: 4 * config.ONE_MEGABYTE, maxBuffers: 20 };
-            await blockBlobClient.uploadStream(
+            uploadResponse = await blockBlobClient.uploadStream(
                 uploadStream,
+                uploadOptions.bufferSize,
+                uploadOptions.maxBuffers,
+                { blobHTTPHeaders: { blobContentType: contentTypeMap[body.format] } }
+            );
+        } else {
+            const fullResponse = await queryStream(`${body.query}&rows=${numFound}`, body.format);
+
+            uploadResponse = await blockBlobClient.uploadStream(
+                fullResponse,
                 uploadOptions.bufferSize,
                 uploadOptions.maxBuffers,
                 { blobHTTPHeaders: { blobContentType: contentTypeMap[body.format] } }
             );
         }
 
+        context.log(`Blob upload complete requestId: ${uploadResponse.requestId}`);
+
         context.res = {
             headers: { 'Content-Type': 'application/json' },
             body: {
                 req: body,
                 solrResponseMeta,
+                fileName: blobName,
                 url: blockBlobClient.url,
+                blobRequestId: uploadResponse.requestId,
             },
         };
     } catch (error) {
