@@ -20,4 +20,8 @@ module.exports = {
         user: process.env.SOLR_USERNAME,
         password: process.env.SOLR_PASSWORD,
     },
+    STORAGE_CONNECTION_STRING: process.env.STORAGE_CONNECTION_STRING,
+    DOWNLOAD_CONTAINER_NAME: process.env.DOWNLOAD_CONTAINER_NAME,
+    APPEND_MAX_LIMIT: 4194304,
+    SOLR_MAX_ROWS: 1000,
 };
