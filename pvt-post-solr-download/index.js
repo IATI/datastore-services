@@ -125,6 +125,49 @@ module.exports = async (context, req) => {
                 uploadOptions.maxBuffers,
                 { blobHTTPHeaders: { blobContentType: contentTypeMap[body.format] } }
             );
+        } else if (body.format === 'JSON') {
+            let start = 0;
+            const header = '[';
+            const footer = ']';
+
+            const uploadStream = new PassThrough();
+
+            uploadStream.write(header);
+
+            queryUrl.searchParams.set('rows', config.SOLR_MAX_ROWS);
+
+            do {
+                context.log(
+                    `Downloading ${start}-${
+                        start + config.SOLR_MAX_ROWS < numFound
+                            ? start + config.SOLR_MAX_ROWS
+                            : numFound
+                    } rows of total: ${numFound}`
+                );
+                queryUrl.searchParams.set('start', start);
+                // eslint-disable-next-line no-await-in-loop
+                const formattedResponse = await query(queryUrl, body.format, true);
+
+                if (start !== 0) {
+                    uploadStream.write(',');
+                }
+                let respString = JSON.stringify(formattedResponse);
+                // strip [ ]
+                respString = respString.slice(1, respString.length - 1);
+                uploadStream.write(respString);
+
+                start += config.SOLR_MAX_ROWS;
+            } while (start < numFound);
+
+            uploadStream.write(footer);
+            uploadStream.end();
+
+            uploadResponse = await blockBlobClient.uploadStream(
+                uploadStream,
+                uploadOptions.bufferSize,
+                uploadOptions.maxBuffers,
+                { blobHTTPHeaders: { blobContentType: contentTypeMap[body.format] } }
+            );
         } else {
             queryUrl.searchParams.set('rows', numFound);
             const fullResponse = await query(queryUrl, body.format, false, true);
