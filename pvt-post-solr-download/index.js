@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const { BlobServiceClient } = require('@azure/storage-blob');
 const { PassThrough } = require('stream');
-const { query, queryStream } = require('../solr/solr');
+const { query } = require('../solr/solr');
 const config = require('../config/config');
 
 const contentTypeMap = {
@@ -127,7 +127,7 @@ module.exports = async (context, req) => {
             );
         } else {
             queryUrl.searchParams.set('rows', numFound);
-            const fullResponse = await queryStream(queryUrl, body.format);
+            const fullResponse = await query(queryUrl, body.format, false, true);
             context.log('Streaming query from Solr to Blob');
             uploadResponse = await blockBlobClient.uploadStream(
                 fullResponse,
