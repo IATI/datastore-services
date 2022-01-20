@@ -1,7 +1,13 @@
 const { v4: uuidv4 } = require('uuid');
 const { BlobServiceClient } = require('@azure/storage-blob');
-const { query } = require('../solr/solr');
+const { query, queryStream } = require('../solr/solr');
 const config = require('../config/config');
+
+const contentTypeMap = {
+    JSON: 'application/json',
+    CSV: 'text/plain',
+    XML: 'application/xml',
+};
 
 module.exports = async (context, req) => {
     try {
@@ -63,108 +69,29 @@ module.exports = async (context, req) => {
         );
         const blobName = `${uuidv4()}.${body.format.toLowerCase()}`;
 
-        // Get an append blob client
-        const appendBlobClient = containerClient.getAppendBlobClient(blobName);
+        // Get an block blob client
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+        const ONE_MEGABYTE = 1024 * 1024;
+        const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 
         const { numFound } = solrResponseMeta;
-        let start = 0;
-        await appendBlobClient.create();
 
-        switch (body.format) {
-            case 'JSON':
-                // start JSON array
-                await appendBlobClient.appendBlock('[', 1);
-                break;
+        const fullResponse = await queryStream(`${body.query}&rows=${numFound}`, body.format);
 
-            default:
-                break;
-        }
-
-        do {
-            context.log(
-                `Downloading ${start}-${
-                    start + config.SOLR_MAX_ROWS < numFound
-                        ? start + config.SOLR_MAX_ROWS
-                        : numFound
-                } rows of total: ${numFound}`
-            );
-            // eslint-disable-next-line no-await-in-loop
-            const formattedResponse = await query(
-                `${body.query}&start=${start}&rows=${config.SOLR_MAX_ROWS}`,
-                body.format,
-                true
-            );
-
-            let uploadStr;
-            let resSize;
-            let uploadBuf;
-            switch (body.format) {
-                case 'JSON':
-                    uploadStr = JSON.stringify(formattedResponse);
-                    // remove '[' ']' for appending
-                    uploadStr = uploadStr.slice(1, uploadStr.length - 1);
-                    // add , on end for appending
-                    if (start + config.SOLR_MAX_ROWS < numFound) {
-                        uploadStr += ',';
-                    }
-                    uploadBuf = Buffer.from(uploadStr);
-                    resSize = Buffer.byteLength(uploadBuf);
-                    context.log(`Byte Size: ${resSize.toFixed(0)} / ${config.APPEND_MAX_LIMIT}`);
-                    context.log(`Chunk Size: ${Number(resSize / (1024 * 1024)).toFixed(4)} MiB`);
-                    break;
-                default:
-                    break;
-            }
-            if (resSize > config.APPEND_MAX_LIMIT) {
-                context.log(`Chunk larger than max append, breaking up`);
-                let byteStart = 0;
-                do {
-                    const byteEnd =
-                        byteStart + config.APPEND_MAX_LIMIT < resSize
-                            ? byteStart + config.APPEND_MAX_LIMIT
-                            : resSize;
-                    context.log(`Uploading chunk: ${byteStart}-${byteEnd} of ${resSize}`);
-                    const uploadSlice = uploadBuf.slice(byteStart, byteEnd);
-                    // eslint-disable-next-line no-await-in-loop
-                    const uploadBlobResponse = await appendBlobClient.appendBlock(
-                        uploadSlice,
-                        Buffer.byteLength(uploadSlice)
-                    );
-                    context.log(
-                        `Blob was uploaded successfully. requestId: ${uploadBlobResponse.requestId}`
-                    );
-                    byteStart += config.APPEND_MAX_LIMIT + 1;
-                } while (byteStart < resSize);
-            } else {
-                // eslint-disable-next-line no-await-in-loop
-                const uploadBlobResponse = await appendBlobClient.appendBlock(
-                    uploadStr,
-                    uploadStr.length
-                );
-                context.log(
-                    `Blob was uploaded successfully. requestId: ${uploadBlobResponse.requestId}`
-                );
-            }
-
-            start += config.SOLR_MAX_ROWS;
-        } while (start < numFound);
-
-        switch (body.format) {
-            case 'JSON':
-                // close JSON array
-                await appendBlobClient.appendBlock(']', 1);
-                break;
-
-            default:
-                break;
-        }
+        await blockBlobClient.uploadStream(
+            fullResponse,
+            uploadOptions.bufferSize,
+            uploadOptions.maxBuffers,
+            { blobHTTPHeaders: { blobContentType: contentTypeMap[body.format] } }
+        );
 
         context.res = {
             headers: { 'Content-Type': 'application/json' },
             body: {
                 req: body,
                 solrResponseMeta,
-                url: appendBlobClient.url,
+                url: blockBlobClient.url,
             },
         };
     } catch (error) {
