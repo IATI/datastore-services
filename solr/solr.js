@@ -37,22 +37,21 @@ module.exports = {
         checkRespStatus(response);
     },
 
-    query: async (query, format = 'JSON', docsOnly = false) => {
-        let fullQuery = query;
+    query: async (url, format = 'JSON', docsOnly = false) => {
         switch (format) {
             case 'CSV':
-                fullQuery += '&wt=csv';
+                url.searchParams.set('wt', 'csv');
                 break;
             case 'JSON':
-                fullQuery += '&wt=json';
+                url.searchParams.set('wt', 'json');
                 break;
             case 'XML':
-                fullQuery += '&fl=iati_xml';
+                url.searchParams.set('fl', 'iati_xml');
                 break;
             default:
                 break;
         }
-        const response = await fetch(`${config.SOLRCONFIG.url}${fullQuery}`, {
+        const response = await fetch(url, {
             headers: {
                 Authorization: `Basic ${Buffer.from(
                     `${config.SOLRCONFIG.user}:${config.SOLRCONFIG.password}`,
@@ -75,22 +74,21 @@ module.exports = {
         return body;
     },
 
-    queryStream: async (query, format = 'JSON') => {
-        let fullQuery = query;
+    queryStream: async (url, format = 'JSON') => {
         switch (format) {
             case 'CSV':
-                fullQuery += '&wt=csv';
+                url.searchParams.set('wt', 'csv');
                 break;
             case 'JSON':
-                fullQuery += '&wt=json';
+                url.searchParams.set('wt', 'json');
                 break;
             case 'XML':
-                fullQuery = fullQuery.replace('/select', '/iati');
+                url.searchParams.set('fl', 'iati_xml');
                 break;
             default:
                 break;
         }
-        const response = await fetch(`${config.SOLRCONFIG.url}${fullQuery}`, {
+        const response = await fetch(url, {
             headers: {
                 Authorization: `Basic ${Buffer.from(
                     `${config.SOLRCONFIG.user}:${config.SOLRCONFIG.password}`,
