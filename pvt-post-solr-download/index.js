@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const { BlobServiceClient } = require('@azure/storage-blob');
-const { query, queryStream } = require('../solr/solr');
+const { PassThrough } = require('stream');
+const { query } = require('../solr/solr');
 const config = require('../config/config');
 
 const contentTypeMap = {
@@ -72,19 +73,51 @@ module.exports = async (context, req) => {
         // Get an block blob client
         const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-        const ONE_MEGABYTE = 1024 * 1024;
-        const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
-
         const { numFound } = solrResponseMeta;
 
-        const fullResponse = await queryStream(`${body.query}&rows=${numFound}`, body.format);
+        if (body.format === 'XML') {
+            let start = 0;
+            const date = new Date();
+            const header = `<?xml version="1.0" encoding="UTF-8"?>\n<iati-activities version="2.03" generated-datetime="${date.toISOString()}">\n`;
+            const footer = '</iati-activities>';
 
-        await blockBlobClient.uploadStream(
-            fullResponse,
-            uploadOptions.bufferSize,
-            uploadOptions.maxBuffers,
-            { blobHTTPHeaders: { blobContentType: contentTypeMap[body.format] } }
-        );
+            const uploadStream = new PassThrough();
+
+            uploadStream.write(header);
+
+            do {
+                context.log(
+                    `Downloading ${start}-${
+                        start + config.SOLR_MAX_ROWS < numFound
+                            ? start + config.SOLR_MAX_ROWS
+                            : numFound
+                    } rows of total: ${numFound}`
+                );
+                // eslint-disable-next-line no-await-in-loop
+                const formattedResponse = await query(
+                    `${body.query}&start=${start}&rows=${config.SOLR_MAX_ROWS}`,
+                    body.format,
+                    true
+                );
+
+                formattedResponse.forEach((doc) => {
+                    uploadStream.write(doc.iati_xml);
+                });
+
+                start += config.SOLR_MAX_ROWS;
+            } while (start < numFound);
+
+            uploadStream.write(footer);
+            uploadStream.end();
+
+            const uploadOptions = { bufferSize: 4 * config.ONE_MEGABYTE, maxBuffers: 20 };
+            await blockBlobClient.uploadStream(
+                uploadStream,
+                uploadOptions.bufferSize,
+                uploadOptions.maxBuffers,
+                { blobHTTPHeaders: { blobContentType: contentTypeMap[body.format] } }
+            );
+        }
 
         context.res = {
             headers: { 'Content-Type': 'application/json' },

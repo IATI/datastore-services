@@ -47,7 +47,7 @@ module.exports = {
                 fullQuery += '&wt=json';
                 break;
             case 'XML':
-                fullQuery = fullQuery.replace('/select', '/iati');
+                fullQuery += '&fl=iati_xml';
                 break;
             default:
                 break;
@@ -62,7 +62,8 @@ module.exports = {
         });
         checkRespStatus(response);
         let body;
-        if (format !== 'JSON') {
+
+        if (format === 'CSV') {
             body = await response.text();
         } else {
             body = await response.json();
