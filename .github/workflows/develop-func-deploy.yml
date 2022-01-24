@@ -134,7 +134,7 @@ jobs:
                     "name": "AzureWebJobsSecretStorageKeyVaultName",
                     "value": "${{ env.KV_NAME }}",
                     "slotSetting": false
-                },
+                }
             ]
 
       - name: 'Run Azure Functions Action'
