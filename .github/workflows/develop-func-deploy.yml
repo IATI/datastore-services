@@ -29,7 +29,7 @@ env:
   SOLR_PASSWORD: ${{ secrets.DEV_SOLR_PASSWORD }}
   STORAGE_CONNECTION_STRING: ${{ secrets.DEV_STORAGE_CONNECTION_STRING }}
   DOWNLOAD_CONTAINER_NAME: ${{ secrets.DEV_DOWNLOAD_CONTAINER_NAME }}
-  KV_NAME: ${{ secrets.DEV_KEY_VAULT_NAME }}
+  KV_URI: ${{ secrets.DEV_KV_URI }}
   API_KEY: ${{ secrets.DEV_VALIDATOR_SERVICES_KEY_VALUE }}
 
 jobs:
@@ -131,8 +131,8 @@ jobs:
                     "slotSetting": false
                 },
                 {
-                    "name": "AzureWebJobsSecretStorageKeyVaultName",
-                    "value": "${{ env.KV_NAME }}",
+                    "name": "AzureWebJobsSecretStorageKeyVaultUri",
+                    "value": "${{ env.KV_URI }}",
                     "slotSetting": false
                 }
             ]
