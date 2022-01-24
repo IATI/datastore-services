@@ -29,6 +29,8 @@ env:
   SOLR_PASSWORD: ${{ secrets.DEV_SOLR_PASSWORD }}
   STORAGE_CONNECTION_STRING: ${{ secrets.DEV_STORAGE_CONNECTION_STRING }}
   DOWNLOAD_CONTAINER_NAME: ${{ secrets.DEV_DOWNLOAD_CONTAINER_NAME }}
+  KV_NAME: ${{ secrets.DEV_KEY_VAULT_NAME }}
+  API_KEY: ${{ secrets.DEV_VALIDATOR_SERVICES_KEY_VALUE }}
 
 jobs:
   should_run:
@@ -122,7 +124,17 @@ jobs:
                     "name": "DOWNLOAD_CONTAINER_NAME",
                     "value": "${{ env.DOWNLOAD_CONTAINER_NAME }}",
                     "slotSetting": false
-                }
+                },
+                {
+                    "name": "AzureWebJobsSecretStorageType",
+                    "value": "keyvault",
+                    "slotSetting": false
+                },
+                {
+                    "name": "AzureWebJobsSecretStorageKeyVaultName",
+                    "value": "${{ env.KV_NAME }}",
+                    "slotSetting": false
+                },
             ]
 
       - name: 'Run Azure Functions Action'
@@ -130,3 +142,21 @@ jobs:
         with:
           app-name: ${{ env.NAME }}-${{ env.STAGE }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
+  integration-test:
+    needs: build-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v2.4.0
+
+      - name: 'Install newman'
+        run: |
+          sudo npm i -g newman
+
+      - name: 'Run integration tests'
+        run: |
+          newman run integration-tests/datastore-services-integration-tests.postman_collection.json \
+            -e integration-tests/envs/func-datastore-services-dev.postman_environment.json \
+            --env-var keyValue=$API_KEY \
+            --delay-request 50
