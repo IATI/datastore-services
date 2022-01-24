@@ -5,7 +5,7 @@
     "scripts": {
         "start": "func start --javascript",
         "start:verbose": "func start --javascript --verbose",
-        "test": "newman run integration-tests/azure-function-node-microservice-template.postman_collection.json -e integration-tests/envs/local-function-7071.postman_environment.json",
+        "int:test": "newman run integration-tests/datastore-services-integration-tests.postman_collection.json -e integration-tests/envs/local-function-7071.postman_environment.json",
         "prepare": "husky install"
     },
     "author": "IATI",
