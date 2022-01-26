@@ -67,6 +67,8 @@ module.exports = async (context, req) => {
         const blobServiceClient = BlobServiceClient.fromConnectionString(
             config.STORAGE_CONNECTION_STRING
         );
+        // set service version so Content-Disposition is returned by Blob API when retreiving
+        await blobServiceClient.setProperties({ defaultServiceVersion: '2020-12-06' });
         const containerClient = blobServiceClient.getContainerClient(
             config.DOWNLOAD_CONTAINER_NAME
         );
@@ -76,7 +78,16 @@ module.exports = async (context, req) => {
         const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
         const { numFound } = solrResponseMeta;
-        const uploadOptions = { bufferSize: 4 * config.ONE_MEGABYTE, maxBuffers: 20 };
+        const uploadOptions = {
+            bufferSize: 4 * config.ONE_MEGABYTE,
+            maxBuffers: 20,
+        };
+        const uploadConfig = {
+            blobHTTPHeaders: {
+                blobContentType: contentTypeMap[body.format],
+                blobContentDisposition: `attachment; filename=${blobName}`,
+            },
+        };
         let uploadResponse;
         const queryUrl = new URL(config.SOLRCONFIG.url + body.query);
 
@@ -123,7 +134,7 @@ module.exports = async (context, req) => {
                 uploadStream,
                 uploadOptions.bufferSize,
                 uploadOptions.maxBuffers,
-                { blobHTTPHeaders: { blobContentType: contentTypeMap[body.format] } }
+                uploadConfig
             );
         } else if (body.format === 'JSON') {
             let start = 0;
@@ -166,7 +177,7 @@ module.exports = async (context, req) => {
                 uploadStream,
                 uploadOptions.bufferSize,
                 uploadOptions.maxBuffers,
-                { blobHTTPHeaders: { blobContentType: contentTypeMap[body.format] } }
+                uploadConfig
             );
         } else {
             queryUrl.searchParams.set('rows', numFound);
@@ -176,7 +187,7 @@ module.exports = async (context, req) => {
                 fullResponse,
                 uploadOptions.bufferSize,
                 uploadOptions.maxBuffers,
-                { blobHTTPHeaders: { blobContentType: contentTypeMap[body.format] } }
+                uploadConfig
             );
         }
 
