@@ -18,9 +18,10 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Body contains error: no body\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.error).to.eql(\"No body\");",
+											"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+											"",
+											"pm.test(\"Error response contains 'No body'\", function () {",
+											"    pm.expect(statusResponse.output.error).to.eql('No body');",
 											"});"
 										],
 										"type": "text/javascript"
@@ -31,14 +32,13 @@
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "{{baseURL}}/pvt/solr/download",
+									"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
 									"host": [
 										"{{baseURL}}"
 									],
 									"path": [
-										"pvt",
-										"solr",
-										"download"
+										"orchestrators",
+										"DownloadOrchestrator"
 									]
 								}
 							},
@@ -51,9 +51,10 @@
 									"listen": "test",
 									"script": {
 										"exec": [
+											"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+											"",
 											"pm.test(\"Body contains error: no query key\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.error).to.eql(\"Body must contain a key \\\"query\\\"\");",
+											"    pm.expect(statusResponse.output.error).to.eql(\"Body must contain a key \\\"query\\\"\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -73,14 +74,13 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseURL}}/pvt/solr/download",
+									"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
 									"host": [
 										"{{baseURL}}"
 									],
 									"path": [
-										"pvt",
-										"solr",
-										"download"
+										"orchestrators",
+										"DownloadOrchestrator"
 									]
 								}
 							},
@@ -93,9 +93,10 @@
 									"listen": "test",
 									"script": {
 										"exec": [
+											"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+											"",
 											"pm.test(\"Body contains error: no format key\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.error).to.eql(\"Body must contain a key \\\"format\\\"\");",
+											"    pm.expect(statusResponse.output.error).to.eql(\"Body must contain a key \\\"format\\\"\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -115,14 +116,13 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseURL}}/pvt/solr/download",
+									"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
 									"host": [
 										"{{baseURL}}"
 									],
 									"path": [
-										"pvt",
-										"solr",
-										"download"
+										"orchestrators",
+										"DownloadOrchestrator"
 									]
 								}
 							},
@@ -135,9 +135,10 @@
 									"listen": "test",
 									"script": {
 										"exec": [
+											"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+											"",
 											"pm.test(\"Body contains error: incorrect format key value\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.error).to.eql(\"format must be one of the following values XML,JSON,CSV\");",
+											"    pm.expect(statusResponse.output.error).to.eql(\"format must be one of the following values XML,JSON,CSV\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -157,14 +158,13 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseURL}}/pvt/solr/download",
+									"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
 									"host": [
 										"{{baseURL}}"
 									],
 									"path": [
-										"pvt",
-										"solr",
-										"download"
+										"orchestrators",
+										"DownloadOrchestrator"
 									]
 								}
 							},
@@ -186,8 +186,10 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"pm.test(\"Status code is 400\", function () {",
-									"    pm.response.to.have.status(400);",
+									"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+									"",
+									"pm.test(\"Completed Response Status code is 400\", function () {",
+									"    pm.expect(statusResponse.output.status).to.eql(400);",
 									"});"
 								]
 							}
@@ -207,8 +209,9 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"const jsonData = pm.response.json();",
-													"pm.sendRequest(jsonData.url, function (err, response) {",
+													"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+													"",
+													"pm.sendRequest(statusResponse.output.url, function (err, response) {",
 													"    pm.test(\"File download status code is 200\", function () {",
 													"        pm.expect(response.code).to.eql(200);",
 													"    });",
@@ -240,14 +243,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{baseURL}}/pvt/solr/download",
+											"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
 											"host": [
 												"{{baseURL}}"
 											],
 											"path": [
-												"pvt",
-												"solr",
-												"download"
+												"orchestrators",
+												"DownloadOrchestrator"
 											]
 										},
 										"description": "42.75 MiB"
@@ -266,8 +268,9 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"const jsonData = pm.response.json();",
-													"pm.sendRequest(jsonData.url, function (err, response) {",
+													"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+													"",
+													"pm.sendRequest(statusResponse.output.url, function (err, response) {",
 													"    pm.test(\"File download status code is 200\", function () {",
 													"        pm.expect(response.code).to.eql(200);",
 													"    });",
@@ -298,14 +301,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{baseURL}}/pvt/solr/download",
+											"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
 											"host": [
 												"{{baseURL}}"
 											],
 											"path": [
-												"pvt",
-												"solr",
-												"download"
+												"orchestrators",
+												"DownloadOrchestrator"
 											]
 										},
 										"description": "42.75 MiB"
@@ -324,8 +326,8 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"const jsonData = pm.response.json();",
-													"pm.sendRequest(jsonData.url, function (err, response) {",
+													"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+													"pm.sendRequest(statusResponse.output.url, function (err, response) {",
 													"    pm.test(\"File download status code is 200\", function () {",
 													"        pm.expect(response.code).to.eql(200);",
 													"    });",
@@ -364,14 +366,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{baseURL}}/pvt/solr/download",
+											"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
 											"host": [
 												"{{baseURL}}"
 											],
 											"path": [
-												"pvt",
-												"solr",
-												"download"
+												"orchestrators",
+												"DownloadOrchestrator"
 											]
 										},
 										"description": "42.75 MiB"
@@ -396,17 +397,61 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
+									"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+									"",
+									"pm.test(\"Completed Response Status code is 200\", function () {",
+									"    pm.expect(statusResponse.output.status).to.eql(200);",
 									"});",
-									"const jsonData = pm.response.json();",
+									"",
 									"pm.test(\"Body object contains expected keys\", function () {",
-									"    pm.expect(Object.keys(jsonData)).to.have.all.members(['req','solrResponseMeta','fileName','url','blobRequestId']);",
+									"    pm.expect(Object.keys(statusResponse.output)).to.have.all.members(['status','req','solrResponseMeta','fileName','url','blobRequestId']);",
 									"});"
 								]
 							}
 						}
 					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Orchestration Response Status code is 202\", function () {",
+							"    pm.response.to.have.status(202);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"function statusTests(response) {",
+							"    const statusResponse = response.json()",
+							"    pm.collectionVariables.set(\"statusResponseBody\", statusResponse, 'json');",
+							"}",
+							"",
+							"function statusRequest() {",
+							"    pm.sendRequest(jsonData.statusQueryGetUri, function (err, response) { ",
+							"        if (response.code === 200) {",
+							"            statusTests(response)",
+							"        } else if (response.code === 202) {",
+							"            const pauseTime = Number(response.headers.find(h => h.key == \"Retry-After\").value)",
+							"            setTimeout(() => statusRequest(), pauseTime * 1000)",
+							"        }",
+							"    })",
+							"}",
+							"",
+							"statusRequest()"
+						]
+					}
 				}
 			]
 		},
@@ -478,6 +523,12 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "statusResponseBody",
+			"value": ""
 		}
 	]
 }

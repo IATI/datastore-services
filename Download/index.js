@@ -10,52 +10,41 @@ const contentTypeMap = {
     XML: 'application/xml',
 };
 
-module.exports = async (context, req) => {
+module.exports = async (context) => {
     try {
-        const { body } = req;
+        context.log('Starting Download Function');
+        const body = context.bindings.Download;
 
         // No body
         if (!body || JSON.stringify(body) === '{}') {
-            context.res = {
+            return {
                 status: 400,
-                headers: { 'Content-Type': 'application/json' },
-                body: { error: 'No body' },
+                error: 'No body',
             };
-
-            return;
         }
 
         // key query must be in body
         if (!('query' in body)) {
-            context.res = {
+            return {
                 status: 400,
-                headers: { 'Content-Type': 'application/json' },
-                body: { error: 'Body must contain a key "query"' },
+                error: 'Body must contain a key "query"',
             };
-
-            return;
         }
         // key format must be in body
         if (!('format' in body)) {
-            context.res = {
+            return {
                 status: 400,
-                headers: { 'Content-Type': 'application/json' },
-                body: { error: 'Body must contain a key "format"' },
+                error: 'Body must contain a key "format"',
             };
-
-            return;
         }
 
         // format must be 'XML', 'JSON', 'CSV'
         const formats = ['XML', 'JSON', 'CSV'];
         if (!formats.includes(body.format)) {
-            context.res = {
+            return {
                 status: 400,
-                headers: { 'Content-Type': 'application/json' },
-                body: { error: `format must be one of the following values ${formats.join()}` },
+                error: `format must be one of the following values ${formats.join()}`,
             };
-
-            return;
         }
 
         const metaURL = new URL(config.SOLRCONFIG.url + body.query);
@@ -193,21 +182,18 @@ module.exports = async (context, req) => {
 
         context.log(`Blob upload complete. requestId: ${uploadResponse.requestId}`);
 
-        context.res = {
-            headers: { 'Content-Type': 'application/json' },
-            body: {
-                req: body,
-                solrResponseMeta,
-                fileName: blobName,
-                url: blockBlobClient.url,
-                blobRequestId: uploadResponse.requestId,
-            },
+        return {
+            status: 200,
+            req: body,
+            solrResponseMeta,
+            fileName: blobName,
+            url: blockBlobClient.url,
+            blobRequestId: uploadResponse.requestId,
         };
     } catch (error) {
         context.log(error);
-        context.res = {
+        return {
             status: 500,
-            headers: { 'Content-Type': 'application/json' },
             body: error.message,
         };
     }
