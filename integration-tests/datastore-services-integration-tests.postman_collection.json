@@ -1,0 +1,534 @@
+{
+	"info": {
+		"_postman_id": "417d6fa3-0cad-4b00-a60f-3d8fe7fcbbe9",
+		"name": "datastore-services-integration-tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "DSS Download",
+			"item": [
+				{
+					"name": "400",
+					"item": [
+						{
+							"name": "No Body",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+											"",
+											"pm.test(\"Error response contains 'No body'\", function () {",
+											"    pm.expect(statusResponse.output.error).to.eql('No body');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"orchestrators",
+										"DownloadOrchestrator"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Incorrect Body - no query key",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+											"",
+											"pm.test(\"Body contains error: no query key\", function () {",
+											"    pm.expect(statusResponse.output.error).to.eql(\"Body must contain a key \\\"query\\\"\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"hello\": \"world\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"orchestrators",
+										"DownloadOrchestrator"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Incorrect Body - no format key",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+											"",
+											"pm.test(\"Body contains error: no format key\", function () {",
+											"    pm.expect(statusResponse.output.error).to.eql(\"Body must contain a key \\\"format\\\"\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"query\": \"world\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"orchestrators",
+										"DownloadOrchestrator"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Incorrect Body - incorrect format key",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+											"",
+											"pm.test(\"Body contains error: incorrect format key value\", function () {",
+											"    pm.expect(statusResponse.output.error).to.eql(\"format must be one of the following values XML,JSON,CSV\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"query\": \"world\", \"format\": \"FUN\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"orchestrators",
+										"DownloadOrchestrator"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+									"",
+									"pm.test(\"Completed Response Status code is 400\", function () {",
+									"    pm.expect(statusResponse.output.status).to.eql(400);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "200",
+					"item": [
+						{
+							"name": "JSON",
+							"item": [
+								{
+									"name": "Download Solr Query - DIPR GB-COH-06368740-P0055",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+													"",
+													"pm.sendRequest(statusResponse.output.url, function (err, response) {",
+													"    pm.test(\"File download status code is 200\", function () {",
+													"        pm.expect(response.code).to.eql(200);",
+													"    });",
+													"    pm.test(\"File download Content-Disposition header is present and contains 'attachment'\", function () {",
+													"        pm.expect(response.headers.find(h => h.key == \"Content-Disposition\").value).to.contain('attachment');",
+													"    });",
+													"    const file = response.json();",
+													"    pm.test(\"File is able to be downloaded and contains an array of length 1\", function () {",
+													"        pm.expect(file).to.be.an('array')",
+													"        pm.expect(file.length).to.eql(1)",
+													"    })",
+													"});",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"GB-COH-06368740-P0055\\\"\",\n    \"format\": \"JSON\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"orchestrators",
+												"DownloadOrchestrator"
+											]
+										},
+										"description": "42.75 MiB"
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "CSV",
+							"item": [
+								{
+									"name": "Download Solr Query - DIPR GB-COH-06368740-P0055",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+													"",
+													"pm.sendRequest(statusResponse.output.url, function (err, response) {",
+													"    pm.test(\"File download status code is 200\", function () {",
+													"        pm.expect(response.code).to.eql(200);",
+													"    });",
+													"    pm.test(\"File download Content-Disposition header is present and contains 'attachment'\", function () {",
+													"        pm.expect(response.headers.find(h => h.key == \"Content-Disposition\").value).to.contain('attachment');",
+													"    });",
+													"    const file = response.text();",
+													"    pm.test(\"CSV File contains expected headers and row of data\", function () {",
+													"        pm.expect(file).to.contain(\"iati_identifier,reporting_org_ref,reporting_org_type\")",
+													"        pm.expect(file).to.contain(\"GB-COH-06368740-P0055,GB-COH-06368740,21\")",
+													"    })",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"GB-COH-06368740-P0055\\\"&fl=iati_identifier,reporting_org_ref,reporting_org_type\",\n    \"format\": \"CSV\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"orchestrators",
+												"DownloadOrchestrator"
+											]
+										},
+										"description": "42.75 MiB"
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "XML",
+							"item": [
+								{
+									"name": "Download Solr Query - DIPR GB-COH-06368740-P0055",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+													"pm.sendRequest(statusResponse.output.url, function (err, response) {",
+													"    pm.test(\"File download status code is 200\", function () {",
+													"        pm.expect(response.code).to.eql(200);",
+													"    });",
+													"    pm.test(\"File download Content-Disposition header is present and contains 'attachment'\", function () {",
+													"        pm.expect(response.headers.find(h => h.key == \"Content-Disposition\").value).to.contain('attachment');",
+													"    });",
+													"    const xml = response.text()",
+													"    const jsonObject = xml2Json(xml);",
+													"    pm.test(\"XML File contains expected xml declaration\", function () {",
+													"        pm.expect(xml).to.contain(`<?xml version=\"1.0\" encoding=\"UTF-8\"?>`)",
+													"    })",
+													"    pm.test(\"XML File contains expected xml closing tags\", function () {",
+													"        pm.expect(xml).to.contain(`</iati-activity></iati-activities>`)",
+													"    })",
+													"    pm.test(\"XML File contains expected iati-identifier\", function () {",
+													"        console.log(jsonObject['iati-activities']['iati-activity']['iati-identifier'])",
+													"        pm.expect(jsonObject['iati-activities']['iati-activity']['iati-identifier']).to.eql('GB-COH-06368740-P0055')",
+													"    }) ",
+													"});",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"GB-COH-06368740-P0055\\\"&fl=iati_identifier,reporting_org_ref,reporting_org_type\",\n    \"format\": \"XML\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"orchestrators",
+												"DownloadOrchestrator"
+											]
+										},
+										"description": "42.75 MiB"
+									},
+									"response": []
+								}
+							]
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+									"",
+									"pm.test(\"Completed Response Status code is 200\", function () {",
+									"    pm.expect(statusResponse.output.status).to.eql(200);",
+									"});",
+									"",
+									"pm.test(\"Body object contains expected keys\", function () {",
+									"    pm.expect(Object.keys(statusResponse.output)).to.have.all.members(['status','req','solrResponseMeta','fileName','url','blobRequestId']);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Orchestration Response Status code is 202\", function () {",
+							"    pm.response.to.have.status(202);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"function statusTests(response) {",
+							"    const statusResponse = response.json()",
+							"    pm.collectionVariables.set(\"statusResponseBody\", statusResponse, 'json');",
+							"}",
+							"",
+							"function statusRequest() {",
+							"    pm.sendRequest(jsonData.statusQueryGetUri, function (err, response) { ",
+							"        if (response.code === 200) {",
+							"            statusTests(response)",
+							"        } else if (response.code === 202) {",
+							"            const pauseTime = Number(response.headers.find(h => h.key == \"Retry-After\").value)",
+							"            setTimeout(() => statusRequest(), pauseTime * 1000)",
+							"        }",
+							"    })",
+							"}",
+							"",
+							"statusRequest()"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "GET Version",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Body is not empty\", function () {",
+							"    pm.expect(pm.response.text()).to.not.be.empty;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/pub/version",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"pub",
+						"version"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{keyValue}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "{{keyName}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "statusResponseBody",
+			"value": ""
+		}
+	]
+}

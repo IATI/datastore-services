@@ -143,7 +143,7 @@ Creates new collections named `collection.name_newVersion`, aliases to `collecti
       "config": {
         "collection.configName": "activity_configset_4",
         "numShards": 1,
-        "replicationFactor": 3
+        "replicationFactor": 1
       },
       "alias": "activity_solrize"
     },
@@ -152,7 +152,7 @@ Creates new collections named `collection.name_newVersion`, aliases to `collecti
       "config": {
         "collection.configName": "budget_configset_4",
         "numShards": 1,
-        "replicationFactor": 3
+        "replicationFactor": 1
       },
       "alias": "budget_solrize"
     }
@@ -166,6 +166,48 @@ Also see [exampleRequest.json](./pvt-post-solr-create-collections/exampleRequest
 -   Returns
 
 204 Response
+
+### `POST /pvt/solr/download`
+
+Downloads the provided Solr query to Azure Blobs and returns URL where it can be downloaded from.
+
+-   Request
+
+-   query - solr query
+-   format - JSON, CSV, or XML
+
+Example:
+
+```json
+{
+    "query": "activity/select?q=reporting_org_ref:\"GB-CHC\" AND recipient_country_code:PK&fl=reporting_org_ref,iati_identifier",
+    "format": "CSV"
+}
+```
+
+-   Returns
+
+200 Response
+
+Example
+
+```json:
+{
+    "req": {
+        "query": "activity/select?q=reporting_org_ref:\"GB-CHC\" AND recipient_country_code:PK&fl=reporting_org_ref,iati_identifier",
+        "format": "CSV"
+    },
+    "solrResponseMeta": {
+        "numFound": 206,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": []
+    },
+    "fileName": "a1410f0b-6f42-4680-8421-d2b5313d3f02.csv",
+    "url": "https://name.blob.core.windows.net/dss-downloads/a1410f0b-6f42-4680-8421-d2b5313d3f02.csv",
+    "blobRequestId": "d953a662-f01e-0001-6511-0ec25c000000"
+}
+```
 
 ## Creating a new route
 

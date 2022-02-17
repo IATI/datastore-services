@@ -1,0 +1,9 @@
+{
+    "bindings": [
+        {
+            "name": "Download",
+            "type": "activityTrigger",
+            "direction": "in"
+        }
+    ]
+}

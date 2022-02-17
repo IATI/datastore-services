@@ -6,8 +6,11 @@ on:
       - '**/README.md' # don't run on README.md file updates anywhere in repo
       - '**/dependabot.yml'
       - '.github/workflows/prod-func-deploy.yml'
+      - './pvt-post-solr-create-collections/exampleRequest.json'
     branches:
-      - develop # update with develop when ready to deploy to Azure
+      - develop
+  schedule:
+    - cron: '17 04 * * *' # 0417am daily
 
 env:
   STAGE: dev # suffix to indicate environment stage
@@ -23,17 +26,26 @@ env:
   PGSSL: ${{ secrets.PGSSL }}
   SOLR_URL: ${{ secrets.DEV_SOLR_API_URL }}
   SOLR_USERNAME: ${{ secrets.DEV_SOLR_USER }}
-  SOLR_PASSWORD: ${{secrets.DEV_SOLR_PASSWORD }}
+  SOLR_PASSWORD: ${{ secrets.DEV_SOLR_PASSWORD }}
+  STORAGE_CONNECTION_STRING: ${{ secrets.DEV_STORAGE_CONNECTION_STRING }}
+  DOWNLOAD_CONTAINER_NAME: ${{ secrets.DEV_DOWNLOAD_CONTAINER_NAME }}
+  KV_URI: ${{ secrets.DEV_KV_URI }}
+  API_KEY: ${{ secrets.DEV_VALIDATOR_SERVICES_KEY_VALUE }}
 
 jobs:
+  should_run:
+    uses: IATI/.github/.github/workflows/should_run.yaml@main
+
   build-deploy:
+    needs: should_run
+    if: ${{ needs.should_run.outputs.should_run == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v2.4.0
 
       - name: 'Setup Node ${{ env.NODE_VERSION }} Environment'
-        uses: actions/setup-node@v2.4.1
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -48,7 +60,7 @@ jobs:
           popd
 
       - name: 'Login via Azure CLI'
-        uses: azure/login@v1.4.1
+        uses: azure/login@v1.4.3
         with:
           creds: ${{ env.AZURE_CREDENTIALS }} # Service Principal credentials saved in GitHub Secrets
 
@@ -102,6 +114,26 @@ jobs:
                     "name": "SOLR_PASSWORD",
                     "value": "${{ env.SOLR_PASSWORD }}",
                     "slotSetting": false
+                },
+                {
+                    "name": "STORAGE_CONNECTION_STRING",
+                    "value": "${{ env.STORAGE_CONNECTION_STRING }}",
+                    "slotSetting": false
+                },
+                {
+                    "name": "DOWNLOAD_CONTAINER_NAME",
+                    "value": "${{ env.DOWNLOAD_CONTAINER_NAME }}",
+                    "slotSetting": false
+                },
+                {
+                    "name": "AzureWebJobsSecretStorageType",
+                    "value": "keyvault",
+                    "slotSetting": false
+                },
+                {
+                    "name": "AzureWebJobsSecretStorageKeyVaultUri",
+                    "value": "${{ env.KV_URI }}",
+                    "slotSetting": false
                 }
             ]
 
@@ -110,3 +142,21 @@ jobs:
         with:
           app-name: ${{ env.NAME }}-${{ env.STAGE }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
+  integration-test:
+    needs: build-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v2.4.0
+
+      - name: 'Install newman'
+        run: |
+          sudo npm i -g newman
+
+      - name: 'Run integration tests'
+        run: |
+          newman run integration-tests/datastore-services-integration-tests.postman_collection.json \
+            -e integration-tests/envs/func-datastore-services-dev.postman_environment.json \
+            --env-var keyValue=$API_KEY \
+            --delay-request 50

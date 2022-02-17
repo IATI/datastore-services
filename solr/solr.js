@@ -36,4 +36,45 @@ module.exports = {
         );
         checkRespStatus(response);
     },
+
+    query: async (url, format = 'JSON', docsOnly = false, stream = false) => {
+        switch (format) {
+            case 'CSV':
+                url.searchParams.set('wt', 'csv');
+                break;
+            case 'JSON':
+                url.searchParams.set('wt', 'json');
+                break;
+            case 'XML':
+                url.searchParams.set('fl', 'iati_xml');
+                break;
+            default:
+                break;
+        }
+        const response = await fetch(url, {
+            headers: {
+                Authorization: `Basic ${Buffer.from(
+                    `${config.SOLRCONFIG.user}:${config.SOLRCONFIG.password}`,
+                    'binary'
+                ).toString('base64')}`,
+            },
+        });
+        checkRespStatus(response);
+
+        if (stream) {
+            return response.body;
+        }
+        let body;
+
+        if (format === 'CSV') {
+            body = await response.text();
+        } else {
+            body = await response.json();
+            if (docsOnly) {
+                body = body.response.docs;
+            }
+        }
+
+        return body;
+    },
 };
