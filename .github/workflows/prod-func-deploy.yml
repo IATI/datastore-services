@@ -20,6 +20,10 @@ env:
   SOLR_URL: ${{ secrets.PROD_SOLR_API_URL }}
   SOLR_USERNAME: ${{ secrets.PROD_SOLR_USER }}
   SOLR_PASSWORD: ${{secrets.PROD_SOLR_PASSWORD }}
+  STORAGE_CONNECTION_STRING: ${{ secrets.PROD_STORAGE_CONNECTION_STRING }}
+  DOWNLOAD_CONTAINER_NAME: ${{ secrets.PROD_DOWNLOAD_CONTAINER_NAME }}
+  KV_URI: ${{ secrets.PROD_KV_URI }}
+  API_KEY: ${{ secrets.PROD_VALIDATOR_SERVICES_KEY_VALUE }}
 
 jobs:
   build-deploy:
@@ -98,6 +102,26 @@ jobs:
                     "name": "SOLR_PASSWORD",
                     "value": "${{ env.SOLR_PASSWORD }}",
                     "slotSetting": false
+                },
+                {
+                    "name": "STORAGE_CONNECTION_STRING",
+                    "value": "${{ env.STORAGE_CONNECTION_STRING }}",
+                    "slotSetting": false
+                },
+                {
+                    "name": "DOWNLOAD_CONTAINER_NAME",
+                    "value": "${{ env.DOWNLOAD_CONTAINER_NAME }}",
+                    "slotSetting": false
+                },
+                {
+                    "name": "AzureWebJobsSecretStorageType",
+                    "value": "keyvault",
+                    "slotSetting": false
+                },
+                {
+                    "name": "AzureWebJobsSecretStorageKeyVaultUri",
+                    "value": "${{ env.KV_URI }}",
+                    "slotSetting": false
                 }
             ]
 
@@ -106,3 +130,21 @@ jobs:
         with:
           app-name: ${{ env.NAME }}-${{ env.STAGE }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
+  integration-test:
+    needs: build-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v2.4.0
+
+      - name: 'Install newman'
+        run: |
+          sudo npm i -g newman
+
+      - name: 'Run integration tests'
+        run: |
+          newman run integration-tests/datastore-services-integration-tests.postman_collection.json \
+            -e integration-tests/envs/func-datastore-services-prod.postman_environment.json \
+            --env-var keyValue=$API_KEY \
+            --delay-request 50
