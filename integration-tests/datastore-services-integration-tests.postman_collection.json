@@ -220,8 +220,8 @@
 													"    });",
 													"    const file = response.json();",
 													"    pm.test(\"File is able to be downloaded and contains an array of length 1\", function () {",
-													"        pm.expect(file).to.be.an('array')",
-													"        pm.expect(file.length).to.eql(1)",
+													"        pm.expect(file.response.docs).to.be.an('array')",
+													"        pm.expect(file.response.docs.length).to.eql(1)",
 													"    })",
 													"});",
 													""

@@ -86,6 +86,7 @@ module.exports = async (context) => {
         }
 
         if (body.format === 'XML') {
+            // XML - have to wrap in <iati-activities> and paginate to download raw iati xml from solr
             let start = 0;
             const date = new Date();
             const header = `<?xml version="1.0" encoding="UTF-8"?>\n<iati-activities version="2.03" generated-datetime="${date.toISOString()}">\n`;
@@ -125,51 +126,10 @@ module.exports = async (context) => {
                 uploadOptions.maxBuffers,
                 uploadConfig
             );
-        } else if (body.format === 'JSON') {
-            let start = 0;
-            const header = '[';
-            const footer = ']';
-
-            const uploadStream = new PassThrough();
-
-            uploadStream.write(header);
-
-            queryUrl.searchParams.set('rows', config.SOLR_MAX_ROWS);
-
-            do {
-                context.log(
-                    `Downloading ${start}-${
-                        start + config.SOLR_MAX_ROWS < numFound
-                            ? start + config.SOLR_MAX_ROWS
-                            : numFound
-                    } rows of total: ${numFound}`
-                );
-                queryUrl.searchParams.set('start', start);
-                // eslint-disable-next-line no-await-in-loop
-                const formattedResponse = await query(queryUrl, body.format, true);
-
-                if (start !== 0) {
-                    uploadStream.write(',');
-                }
-                let respString = JSON.stringify(formattedResponse);
-                // strip [ ]
-                respString = respString.slice(1, respString.length - 1);
-                uploadStream.write(respString);
-
-                start += config.SOLR_MAX_ROWS;
-            } while (start < numFound);
-
-            uploadStream.write(footer);
-            uploadStream.end();
-
-            uploadResponse = await blockBlobClient.uploadStream(
-                uploadStream,
-                uploadOptions.bufferSize,
-                uploadOptions.maxBuffers,
-                uploadConfig
-            );
         } else {
+            // JSON, CSV - request all rows and stream directly to blob
             queryUrl.searchParams.set('rows', numFound);
+            queryUrl.searchParams.set('omitHeader', true);
             const fullResponse = await query(queryUrl, body.format, false, true);
             context.log('Streaming query from Solr to Blob');
             uploadResponse = await blockBlobClient.uploadStream(
