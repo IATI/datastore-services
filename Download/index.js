@@ -107,6 +107,9 @@ module.exports = async (context) => {
                     } rows of total: ${numFound}`
                 );
                 queryUrl.searchParams.set('start', start);
+
+                // only fetch iati_xml
+                queryUrl.searchParams.set('fl', 'iati_xml');
                 // eslint-disable-next-line no-await-in-loop
                 const formattedResponse = await query(queryUrl, body.format, true);
 
