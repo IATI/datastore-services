@@ -11,7 +11,7 @@
     "author": "IATI",
     "dependencies": {
         "@azure/storage-blob": "^12.8.0",
-        "applicationinsights": "^2.2.1",
+        "applicationinsights": "^2.2.2",
         "dotenv": "^16.0.0",
         "durable-functions": "^1.5.4",
         "node-fetch": "^2.6.7",
