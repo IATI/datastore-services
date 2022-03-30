@@ -6,7 +6,7 @@
             "direction": "in",
             "name": "req",
             "methods": ["patch"],
-            "route": "pvt/db/clear-solr"
+            "route": "pvt/db/solr-reindex"
         },
         {
             "type": "http",
