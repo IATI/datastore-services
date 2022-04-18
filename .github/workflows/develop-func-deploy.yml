@@ -11,6 +11,7 @@ on:
       - develop
   schedule:
     - cron: '17 04 * * *' # 0417am daily
+  workflow_dispatch:
 
 env:
   STAGE: dev # suffix to indicate environment stage
