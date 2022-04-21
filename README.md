@@ -167,7 +167,7 @@ Also see [exampleRequest.json](./pvt-post-solr-create-collections/exampleRequest
 
 204 Response
 
-### `POST /pvt/solr/download`
+### `POST /pvt/orchestrators/DownloadOrchestrator`
 
 Downloads the provided Solr query to Azure Blobs and returns URL where it can be downloaded from.
 
