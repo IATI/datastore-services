@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const config = require('../config/config');
-const { checkRespStatus } = require('../utils/utils');
+const { checkRespStatus, prependBOM, BOM } = require('../utils/utils');
 
 const makeQueryParamStr = (paramObject) =>
     Object.keys(paramObject).reduce((acc, key) => `${acc}&${key}=${paramObject[key]}`, '');
@@ -51,6 +51,9 @@ module.exports = {
             case 'XLSX':
                 url.searchParams.set('wt', 'xlsx');
                 break;
+            case 'XL-CSV':
+                url.searchParams.set('wt', 'csv');
+                break;
             default:
                 break;
         }
@@ -65,12 +68,18 @@ module.exports = {
         checkRespStatus(response);
 
         if (stream) {
+            if (format === 'XL-CSV') {
+                return response.body.pipe(prependBOM);
+            }
             return response.body;
         }
         let body;
 
         if (['CSV', 'XLSX'].includes(format)) {
             body = await response.text();
+        } else if (format === 'XL-CSV') {
+            body = await response.text();
+            body = BOM + body;
         } else {
             body = await response.json();
             if (docsOnly) {
