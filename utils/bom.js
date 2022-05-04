@@ -10,23 +10,26 @@ class ConcatStream extends Readable {
     }
 
     append(stream) {
+        if (this.streams.length === 0) {
+            this.stream = stream;
+        }
         this.streams.push(stream);
         stream.on('end', this.onEnd.bind(this));
         stream.on('error', this.onError.bind(this));
     }
 
     _read(size) {
-        const stream = this.streams[0];
-        stream.on(
-            'readable',
-            () => {
-                let content = stream.read(size);
-                while (content != null) {
-                    this.push(content);
-                    content = stream.read(size);
-                }
+        const passRead = () => {
+            let content = this.stream.read(size);
+            while (content != null) {
+                this.push(content);
+                content = this.stream.read(size);
             }
-        );
+            if (this.stream.listenerCount('readable') >= this.stream.getMaxListeners() - 2) {
+                this.stream._events.readable.shift();
+            }
+        };
+        this.stream.on('readable', passRead);
     }
 
     onEnd() {
@@ -35,6 +38,7 @@ class ConcatStream extends Readable {
         if (this.streams.length === 0) {
             this.push(null);
         } else {
+            [this.stream] = this.streams;
             this._read();
         }
     }
