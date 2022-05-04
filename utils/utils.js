@@ -1,7 +1,3 @@
-const { Transform } = require('stream');
-
-const BOM = '\ufeff';
-
 class HTTPResponseError extends Error {
     constructor(response, ...args) {
         super(`HTTP Error Response: ${response.status} ${response.statusText}`, ...args);
@@ -17,12 +13,3 @@ exports.checkRespStatus = (response) => {
     }
     throw new HTTPResponseError(response);
 };
-
-exports.prependBOM = new Transform({
-    transform(chunk, encoding, callback) {
-        console.log('.');
-        callback(null, BOM + chunk.toString());
-    },
-});
-
-exports.BOM = BOM;

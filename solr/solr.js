@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 const config = require('../config/config');
-const { checkRespStatus, prependBOM, BOM } = require('../utils/utils');
+const { checkRespStatus } = require('../utils/utils');
+const { prependBOM, BOM } = require('../utils/bom');
 
 const makeQueryParamStr = (paramObject) =>
     Object.keys(paramObject).reduce((acc, key) => `${acc}&${key}=${paramObject[key]}`, '');
@@ -69,7 +70,7 @@ module.exports = {
 
         if (stream) {
             if (format === 'XL-CSV') {
-                return response.body.pipe(prependBOM);
+                return prependBOM(response.body);
             }
             return response.body;
         }

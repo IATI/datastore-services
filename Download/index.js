@@ -64,7 +64,7 @@ module.exports = async (context) => {
         );
         let blobName;
         if (body.format === 'XL-CSV') {
-            blobName = `${uuidv4()}.csv`;
+            blobName = `${uuidv4()}.xls`;
         } else {
             blobName = `${uuidv4()}.${body.format.toLowerCase()}`;
         }
