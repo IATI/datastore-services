@@ -25,8 +25,8 @@ class ConcatStream extends Readable {
                 this.push(content);
                 content = this.stream.read(size);
             }
-            if (this.stream.listenerCount('readable') >= this.stream.getMaxListeners() - 2) {
-                this.stream._events.readable.shift();
+            if (this.stream.listenerCount('readable') >= 2) {
+                this.stream.removeListener('readable', passRead);
             }
         };
         this.stream.on('readable', passRead);
