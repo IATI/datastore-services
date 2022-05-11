@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: 'Setup Node ${{ env.NODE_VERSION }} Environment'
-        uses: actions/setup-node@v3.0.0
+        uses: actions/setup-node@v3.1.1
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -60,7 +60,7 @@ jobs:
           popd
 
       - name: 'Login via Azure CLI'
-        uses: azure/login@v1.4.3
+        uses: azure/login@v1.4.4
         with:
           creds: ${{ env.AZURE_CREDENTIALS }} # Service Principal credentials saved in GitHub Secrets
 
@@ -138,7 +138,7 @@ jobs:
             ]
 
       - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1.4.4
+        uses: Azure/functions-action@v1.4.5
         with:
           app-name: ${{ env.NAME }}-${{ env.STAGE }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}

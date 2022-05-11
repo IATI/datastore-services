@@ -14,13 +14,27 @@
 
 ## Getting Started
 
-1. Create a new repository from the template
+1. Clone repo
 1. Follow instructions for nvm/node prerequisties above
-1. Update package.json with application name, repository, etc.
+1. Prepare your environment variables as described below
 1. Run `npm i`
 1. Run `npm start` to run the function locally using the Azure Functions Core Tools
 
 ## Environment Variables
+
+### Azure Durable Functions
+
+Needs a `local.settings.json` with an [Azure Storage account](https://github.com/IATI/IATI-Internal-Wiki/blob/main/IATI-Unified-Infra/blobs.md) connection string to work locally. Use an account you've created yourself for this local testing.
+
+```json
+{
+    "IsEncrypted": false,
+    "Values": {
+        "FUNCTIONS_WORKER_RUNTIME": "node",
+        "AzureWebJobsStorage": "<connection string>"
+    }
+}
+```
 
 ### Set Up
 
@@ -32,20 +46,23 @@
 
 -   Needs to be set for running locally, but will not actually report telemetry to the AppInsights instance in my experience
 
-`REDIS_PORT`
+Others:
 
--   local - `6379`
--   Azure - `6380` (tls)
+```
+PGDATABASE=<dbname>
+PGHOST=<host>
+PGPASSWORD=
+PGPORT=5432
+PGSSL=true
+PGUSER=<username>@<host>
 
-`REDIS_KEY`
+SOLR_URL=
+SOLR_USERNAME=
+SOLR_PASSWORD=
 
--   Access key from the Redis instance
-
-`REDIS_HOSTNAME`
-
--   Hostname of redis instance
-
--   If you set no environment variables the application will attempt to connect to the default host:port for a local redis instance `127.0.0.1:6379`
+STORAGE_CONNECTION_STRING=
+DOWNLOAD_CONTAINER_NAME=
+```
 
 ### Adding New
 
@@ -167,7 +184,7 @@ Also see [exampleRequest.json](./pvt-post-solr-create-collections/exampleRequest
 
 204 Response
 
-### `POST /pvt/solr/download`
+### `POST /pvt/orchestrators/DownloadOrchestrator`
 
 Downloads the provided Solr query to Azure Blobs and returns URL where it can be downloaded from.
 
@@ -216,10 +233,6 @@ Example
 ## AppInsights SDK
 
 -   An example of using the `config/appInsights.js` utility is available in the `pvt-get/index.js` where execution time of the function is measured and then logged in 2 ways to the AppInsights Telemetry.
-
-## Filesystem
-
--   Provided in `config/fileSystem.js` which can be imported to get the promisified versions of common `fs` functions since we're stuck with Node v12 for now (these are standard in Node v14)
 
 ## Integration Tests
 
