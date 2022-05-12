@@ -2,7 +2,7 @@ const db = require('../database/db');
 
 module.exports = async (context) => {
     try {
-        await db.clearSolrForAll();
+        await db.reIndexSolrAll();
 
         context.res = {
             status: 204,
