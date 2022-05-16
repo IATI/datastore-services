@@ -138,7 +138,7 @@ jobs:
             ]
 
       - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1.4.5
+        uses: Azure/functions-action@v1.4.6
         with:
           app-name: ${{ env.NAME }}-${{ env.STAGE }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
