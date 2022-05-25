@@ -48,9 +48,6 @@ module.exports = {
             case 'XML':
                 url.searchParams.set('fl', 'iati_xml');
                 break;
-            case 'XLSX':
-                url.searchParams.set('wt', 'xlsx');
-                break;
             default:
                 break;
         }
@@ -69,7 +66,7 @@ module.exports = {
         }
         let body;
 
-        if (['CSV', 'XLSX'].includes(format)) {
+        if (format === 'CSV') {
             body = await response.text();
         } else {
             body = await response.json();

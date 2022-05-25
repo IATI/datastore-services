@@ -8,7 +8,6 @@ const contentTypeMap = {
     JSON: 'application/json',
     CSV: 'text/plain',
     XML: 'application/xml',
-    XLSX: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
 module.exports = async (context) => {
@@ -40,7 +39,7 @@ module.exports = async (context) => {
         }
 
         // format must be 'XML', 'JSON', 'CSV'
-        const formats = ['XML', 'JSON', 'CSV', 'XLSX'];
+        const formats = ['XML', 'JSON', 'CSV'];
         if (!formats.includes(body.format)) {
             return {
                 status: 400,
