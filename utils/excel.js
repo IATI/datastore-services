@@ -1,5 +1,6 @@
 const { Transform } = require('stream');
 
+/* eslint no-underscore-dangle: ["error", { "allow": ["_transform"] }] */
 class ExcelSafeStreamTransform extends Transform {
     constructor() {
         super();
@@ -13,7 +14,7 @@ class ExcelSafeStreamTransform extends Transform {
         this.truncLength = 32700;
     }
 
-    transform(chunk, encoding, callback) {
+    _transform(chunk, encoding, callback) {
         const chunkStr = chunk.toString();
         let pushStr = '';
         for (let i = 0; i < chunkStr.length; i += 1) {
@@ -77,6 +78,7 @@ class ExcelSafeStreamTransform extends Transform {
         callback();
     }
 }
+/* eslint no-underscore-dangle: 0 */
 
 exports.excelSafeStringTransform = (chunkStr, truncLength = 32700) => {
     const sep = ',';
