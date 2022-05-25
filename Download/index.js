@@ -39,7 +39,7 @@ module.exports = async (context) => {
         }
 
         // format must be 'XML', 'JSON', 'CSV'
-        const formats = ['XML', 'JSON', 'CSV', 'XLSX'];
+        const formats = ['XML', 'JSON', 'CSV'];
         if (!formats.includes(body.format)) {
             return {
                 status: 400,
