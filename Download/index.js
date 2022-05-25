@@ -8,7 +8,6 @@ const contentTypeMap = {
     JSON: 'application/json',
     CSV: 'text/plain',
     XML: 'application/xml',
-    XLSX: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
 module.exports = async (context) => {
