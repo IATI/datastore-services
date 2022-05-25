@@ -1,6 +1,6 @@
 {
     "name": "datastore-services",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "description": "Datastore utility endpoints",
     "scripts": {
         "start": "func start --javascript",
@@ -10,22 +10,22 @@
     },
     "author": "IATI",
     "dependencies": {
-        "@azure/storage-blob": "^12.9.0",
-        "applicationinsights": "^2.3.2",
-        "dotenv": "^16.0.0",
+        "@azure/storage-blob": "^12.10.0",
+        "applicationinsights": "^2.3.3",
+        "dotenv": "^16.0.1",
         "durable-functions": "^1.5.4",
         "node-fetch": "^2.6.7",
         "pg": "^8.7.3",
         "uuid": "^8.3.2"
     },
     "devDependencies": {
-        "@prettier/plugin-xml": "^2.1.0",
-        "eslint": "^8.14.0",
+        "@prettier/plugin-xml": "^2.2.0",
+        "eslint": "^8.16.0",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-import": "^2.26.0",
-        "husky": "^7.0.4",
-        "lint-staged": "^12.4.1",
+        "husky": "^8.0.1",
+        "lint-staged": "^12.4.2",
         "prettier": "^2.6.2"
     },
     "lint-staged": {

@@ -109,7 +109,7 @@ let myEnvVariable = config.ENV_VAR
 <0.0.0>
 ```
 
-### `PATCH /pvt/db/clear-solr`
+### `PATCH pvt/db/solr-reindex`
 
 -   Request
 
@@ -121,7 +121,7 @@ let myEnvVariable = config.ENV_VAR
 
 204 Response
 
-### `PATCH /pvt/db/clear-solr/all`
+### `PATCH /pvt/db/solr-reindex/all`
 
 -   Returns
 

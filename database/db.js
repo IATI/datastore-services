@@ -21,13 +21,11 @@ module.exports = {
         return null;
     },
 
-    clearSolrForIds: async (ids) => {
+    reIndexSolrForIds: async (ids) => {
         const sql = `
         UPDATE document
         SET 
-            solrize_start = Null,
-            solrize_end = Null,
-            solr_api_error = Null
+            solrize_reindex = 't'
         WHERE
             id = ANY($1);
         `;
@@ -37,7 +35,7 @@ module.exports = {
         return result;
     },
 
-    clearSolrForAll: async () => {
+    reIndexSolrAll: async () => {
         const pool = new Pool(config.PGCONFIG);
         const client = await pool.connect();
 
@@ -45,10 +43,10 @@ module.exports = {
             await client.query('BEGIN');
             const sql = `
                 UPDATE document
-                SET 
-                    solrize_start = Null,
-                    solrize_end = Null,
-                    solr_api_error = Null
+                SET
+                    solrize_reindex = 't'
+                WHERE
+                    solrize_end is not Null
                 `;
             await client.query(sql);
             await client.query('COMMIT');

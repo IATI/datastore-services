@@ -37,7 +37,7 @@ module.exports = async (context, req) => {
             return;
         }
 
-        await db.clearSolrForIds(body.ids);
+        await db.reIndexSolrForIds(body.ids);
 
         context.res = {
             status: 204,
