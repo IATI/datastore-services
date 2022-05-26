@@ -1,4 +1,47 @@
 const { Transform } = require('stream');
+const chardet = require('chardet');
+
+const findEncoding = (chunk) => {
+    const mapping = {
+        'UTF-8': 'utf8',
+        'UTF-16BE': 'unsupported_by_buffers',
+        'UTF-16LE': 'utf16le',
+        'UTF-32BE': 'unsupported_by_buffers',
+        'UTF-32LE': 'unsupported_by_buffers',
+        Shift_JIS: 'unsupported_by_buffers',
+        'ISO-2022-JP': 'unsupported_by_buffers',
+        'ISO-2022-CN': 'unsupported_by_buffers',
+        'ISO-2022-KR': 'unsupported_by_buffers',
+        GB18030: 'unsupported_by_buffers',
+        Big5: 'unsupported_by_buffers',
+        'EUC-JP': 'unsupported_by_buffers',
+        'EUC-KR': 'unsupported_by_buffers',
+        'ISO-8859-1': 'latin1',
+        'ISO-8859-2': 'latin1', // Technically unsupported, but next best alternative
+        'ISO-8859-5': 'latin1', // Technically unsupported, but next best alternative
+        'ISO-8859-6': 'latin1', // Technically unsupported, but next best alternative
+        'ISO-8859-7': 'latin1', // Technically unsupported, but next best alternative
+        'ISO-8859-8': 'latin1', // Technically unsupported, but next best alternative
+        'ISO-8859-9': 'latin1', // Technically unsupported, but next best alternative
+        'windows-1250': 'latin1', // Technically unsupported, but next best alternative
+        'windows-1251': 'latin1', // Technically unsupported, but next best alternative
+        'windows-1252': 'latin1',
+        'windows-1253': 'latin1', // Technically unsupported, but next best alternative
+        'windows-1254': 'latin1', // Technically unsupported, but next best alternative
+        'windows-1255': 'latin1', // Technically unsupported, but next best alternative
+        'windows-1256': 'latin1', // Technically unsupported, but next best alternative
+        'KOI8-R': 'unsupported_by_buffers',
+        IBM420: 'unsupported_by_buffers',
+        IBM424: 'unsupported_by_buffers',
+    };
+    const encodingGuess = chardet.detect(chunk);
+    const encodingMapping = mapping[encodingGuess];
+    if (encodingMapping === 'unsupported_by_buffers') {
+        return 'utf8'; // To avoid breakages
+    } 
+        return encodingMapping;
+    
+};
 
 /* eslint no-underscore-dangle: ["error", { "allow": ["_transform"] }] */
 class ExcelSafeStreamTransform extends Transform {
@@ -15,7 +58,15 @@ class ExcelSafeStreamTransform extends Transform {
     }
 
     _transform(chunk, encoding, callback) {
-        const chunkStr = chunk.toString();
+        let fileEncoding = '';
+        let chunkStr = '';
+        if (encoding === 'buffer') {
+            fileEncoding = findEncoding(chunk);
+            chunkStr = chunk.toString(fileEncoding);
+        } else {
+            fileEncoding = encoding;
+            chunkStr = chunk;
+        }
         let pushStr = '';
         for (let i = 0; i < chunkStr.length; i += 1) {
             const currentChar = chunkStr.charAt(i);
@@ -74,7 +125,7 @@ class ExcelSafeStreamTransform extends Transform {
                 this.escaped = false;
             }
         }
-        this.push(pushStr);
+        this.push(pushStr, fileEncoding);
         callback();
     }
 }
