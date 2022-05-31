@@ -38,8 +38,8 @@ module.exports = async (context) => {
             };
         }
 
-        // format must be 'XML', 'JSON', 'CSV'
-        const formats = ['XML', 'JSON', 'CSV'];
+        // format must be 'XML', 'JSON', 'CSV', 'XL-CSV'
+        const formats = ['XML', 'JSON', 'CSV', 'XL-CSV'];
         if (!formats.includes(body.format)) {
             return {
                 status: 400,
@@ -61,7 +61,12 @@ module.exports = async (context) => {
         const containerClient = blobServiceClient.getContainerClient(
             config.DOWNLOAD_CONTAINER_NAME
         );
-        const blobName = `${uuidv4()}.${body.format.toLowerCase()}`;
+        let blobName;
+        if (body.format === 'XL-CSV') {
+            blobName = `${uuidv4()}.csv`;
+        } else {
+            blobName = `${uuidv4()}.${body.format.toLowerCase()}`;
+        }
 
         // Get an block blob client
         const blockBlobClient = containerClient.getBlockBlobClient(blobName);

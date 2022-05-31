@@ -12,6 +12,7 @@
     "dependencies": {
         "@azure/storage-blob": "^12.10.0",
         "applicationinsights": "^2.3.3",
+        "chardet": "^1.4.0",
         "dotenv": "^16.0.1",
         "durable-functions": "^1.5.4",
         "node-fetch": "^2.6.7",
