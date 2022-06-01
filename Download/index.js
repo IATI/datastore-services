@@ -38,8 +38,8 @@ module.exports = async (context) => {
             };
         }
 
-        // format must be 'XML', 'JSON', 'CSV', 'XL-CSV'
-        const formats = ['XML', 'JSON', 'CSV', 'XL-CSV'];
+        // format must be 'XML', 'JSON', 'CSV', 'EXCEL'
+        const formats = ['XML', 'JSON', 'CSV', 'EXCEL'];
         if (!formats.includes(body.format)) {
             return {
                 status: 400,
@@ -62,7 +62,7 @@ module.exports = async (context) => {
             config.DOWNLOAD_CONTAINER_NAME
         );
         let blobName;
-        if (body.format === 'XL-CSV') {
+        if (body.format === 'EXCEL') {
             blobName = `${uuidv4()}.csv`;
         } else {
             blobName = `${uuidv4()}.${body.format.toLowerCase()}`;
