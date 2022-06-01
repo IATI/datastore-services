@@ -138,7 +138,7 @@
 											"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
 											"",
 											"pm.test(\"Body contains error: incorrect format key value\", function () {",
-											"    pm.expect(statusResponse.output.error).to.eql(\"format must be one of the following values XML,JSON,CSV,XL-CSV\");",
+											"    pm.expect(statusResponse.output.error).to.eql(\"format must be one of the following values XML,JSON,CSV,EXCEL\");",
 											"});"
 										],
 										"type": "text/javascript"

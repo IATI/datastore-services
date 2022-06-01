@@ -50,7 +50,7 @@ module.exports = {
             case 'XML':
                 url.searchParams.set('fl', 'iati_xml');
                 break;
-            case 'XL-CSV':
+            case 'EXCEL':
                 url.searchParams.set('wt', 'csv');
                 break;
             default:
@@ -67,7 +67,7 @@ module.exports = {
         checkRespStatus(response);
 
         if (stream) {
-            if (format === 'XL-CSV') {
+            if (format === 'EXCEL') {
                 const excelTransformStream = new ExcelSafeStreamTransform();
                 return prependBOM(response.body).pipe(excelTransformStream);
             }
@@ -77,7 +77,7 @@ module.exports = {
 
         if (format === 'CSV') {
             body = await response.text();
-        } else if (format === 'XL-CSV') {
+        } else if (format === 'EXCEL') {
             body = await response.text();
             body = BOM + excelSafeStringTransform(body);
         } else {
