@@ -38,9 +38,8 @@ const findEncoding = (chunk) => {
     const encodingMapping = mapping[encodingGuess];
     if (encodingMapping === 'unsupported_by_buffers') {
         return 'utf8'; // To avoid breakages
-    } 
-        return encodingMapping;
-    
+    }
+    return encodingMapping;
 };
 
 /* eslint no-underscore-dangle: ["error", { "allow": ["_transform"] }] */
