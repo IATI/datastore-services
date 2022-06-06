@@ -14,7 +14,7 @@
         "applicationinsights": "^2.3.3",
         "chardet": "^1.4.0",
         "dotenv": "^16.0.1",
-        "durable-functions": "^1.5.4",
+        "durable-functions": "^2.0.2",
         "node-fetch": "^2.6.7",
         "pg": "^8.7.3",
         "uuid": "^8.3.2"
