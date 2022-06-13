@@ -8,6 +8,7 @@ const contentTypeMap = {
     JSON: 'application/json',
     CSV: 'text/plain',
     XML: 'application/xml',
+    EXCEL: 'text/plain',
 };
 
 module.exports = async (context) => {
