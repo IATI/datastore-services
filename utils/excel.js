@@ -54,18 +54,20 @@ class ExcelSafeStreamTransform extends Transform {
         this.escaped = false;
         this.currentCellLen = 0;
         this.truncLength = 32700;
-        this.encoding = '';
+        this.defaultEncoding = 'utf-8';
     }
 
     _transform(chunk, encoding, callback) {
         let chunkStr = '';
+        let chunkEncoding = this.defaultEncoding;
         if (encoding === 'buffer') {
-            if (this.encoding === '') {
-                this.encoding = findEncoding(chunk);
+            chunkStr = chunk.toString(chunkEncoding);
+            if (chunkStr.includes('�')) {
+                chunkEncoding = findEncoding(chunk);
+                chunkStr = chunk.toString(chunkEncoding);
             }
-            chunkStr = chunk.toString(this.encoding);
         } else {
-            this.encoding = encoding;
+            chunkEncoding = encoding;
             chunkStr = chunk;
         }
         let pushStr = '';
@@ -126,7 +128,7 @@ class ExcelSafeStreamTransform extends Transform {
                 this.escaped = false;
             }
         }
-        this.push(pushStr, this.encoding);
+        this.push(pushStr, chunkEncoding);
         callback();
     }
 }
