@@ -69,7 +69,7 @@ module.exports = {
         if (stream) {
             if (format === 'EXCEL') {
                 const excelTransformStream = new ExcelSafeStreamTransform();
-                return prependBOM(response.body).pipe(excelTransformStream);
+                return prependBOM(response.body.pipe(excelTransformStream));
             }
             return response.body;
         }
