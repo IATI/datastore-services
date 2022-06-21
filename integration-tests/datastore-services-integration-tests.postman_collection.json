@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "417d6fa3-0cad-4b00-a60f-3d8fe7fcbbe9",
+		"_postman_id": "cfae2a04-a74e-48ad-bf80-f81e28075d74",
 		"name": "datastore-services-integration-tests",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13097277"
 	},
 	"item": [
 		{
@@ -294,6 +295,64 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"GB-COH-06368740-P0055\\\"&fl=iati_identifier,reporting_org_ref,reporting_org_type\",\n    \"format\": \"CSV\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"orchestrators",
+												"DownloadOrchestrator"
+											]
+										},
+										"description": "42.75 MiB"
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "EXCEL",
+							"item": [
+								{
+									"name": "Download Solr Query - DIPR GB-COH-06368740-P0055",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+													"",
+													"pm.sendRequest(statusResponse.output.url, function (err, response) {",
+													"    pm.test(\"File download status code is 200\", function () {",
+													"        pm.expect(response.code).to.eql(200);",
+													"    });",
+													"    pm.test(\"File download Content-Disposition header is present and contains 'attachment'\", function () {",
+													"        pm.expect(response.headers.find(h => h.key == \"Content-Disposition\").value).to.contain('attachment');",
+													"    });",
+													"    const file = response.text();",
+													"    pm.test(\"CSV File contains expected headers and row of data\", function () {",
+													"        pm.expect(file).to.contain(\"iati_identifier,reporting_org_ref,reporting_org_type\")",
+													"        pm.expect(file).to.contain(\"GB-COH-06368740-P0055,GB-COH-06368740,21\")",
+													"    })",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"GB-COH-06368740-P0055\\\"&fl=iati_identifier,reporting_org_ref,reporting_org_type\",\n    \"format\": \"EXCEL\"\n}",
 											"options": {
 												"raw": {
 													"language": "json"
