@@ -136,7 +136,7 @@ module.exports = async (context) => {
                 uploadConfig
             );
         } else {
-            // JSON, CSV - request all rows and stream directly to blob
+            // JSON, CSV, EXCEL - request all rows and stream directly to blob
             queryUrl.searchParams.set('rows', numFound);
             queryUrl.searchParams.set('omitHeader', true);
             const fullResponse = await query(queryUrl, body.format, false, true);
