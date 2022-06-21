@@ -200,6 +200,5 @@ exports.excelSafeStringTransform = (chunkStr, truncLength = 32700) => {
     }
     return pushStr;
 };
-// excelSafeStringTransform('1,2,3,4,"555555555555",6,7,8,9', 5)
-// excelSafeStringTransform('1,2,3,4,"5\\"55555555",6,7,8,9', 5)
+
 exports.ExcelSafeStreamTransform = ExcelSafeStreamTransform;
