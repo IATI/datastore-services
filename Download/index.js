@@ -8,6 +8,7 @@ const contentTypeMap = {
     JSON: 'application/json',
     CSV: 'text/plain',
     XML: 'application/xml',
+    EXCEL: 'text/plain',
 };
 
 module.exports = async (context) => {
@@ -38,8 +39,8 @@ module.exports = async (context) => {
             };
         }
 
-        // format must be 'XML', 'JSON', 'CSV'
-        const formats = ['XML', 'JSON', 'CSV'];
+        // format must be 'XML', 'JSON', 'CSV', 'EXCEL'
+        const formats = ['XML', 'JSON', 'CSV', 'EXCEL'];
         if (!formats.includes(body.format)) {
             return {
                 status: 400,
@@ -61,7 +62,12 @@ module.exports = async (context) => {
         const containerClient = blobServiceClient.getContainerClient(
             config.DOWNLOAD_CONTAINER_NAME
         );
-        const blobName = `${uuidv4()}.${body.format.toLowerCase()}`;
+        let blobName;
+        if (body.format === 'EXCEL') {
+            blobName = `${uuidv4()}.csv`;
+        } else {
+            blobName = `${uuidv4()}.${body.format.toLowerCase()}`;
+        }
 
         // Get an block blob client
         const blockBlobClient = containerClient.getBlockBlobClient(blobName);
@@ -130,7 +136,7 @@ module.exports = async (context) => {
                 uploadConfig
             );
         } else {
-            // JSON, CSV - request all rows and stream directly to blob
+            // JSON, CSV, EXCEL - request all rows and stream directly to blob
             queryUrl.searchParams.set('rows', numFound);
             queryUrl.searchParams.set('omitHeader', true);
             const fullResponse = await query(queryUrl, body.format, false, true);

@@ -1,6 +1,8 @@
 const fetch = require('node-fetch');
 const config = require('../config/config');
 const { checkRespStatus } = require('../utils/utils');
+const { prependBOM, BOM } = require('../utils/bom');
+const { ExcelSafeStreamTransform, excelSafeStringTransform } = require('../utils/excel');
 
 const makeQueryParamStr = (paramObject) =>
     Object.keys(paramObject).reduce((acc, key) => `${acc}&${key}=${paramObject[key]}`, '');
@@ -48,6 +50,9 @@ module.exports = {
             case 'XML':
                 url.searchParams.set('fl', 'iati_xml');
                 break;
+            case 'EXCEL':
+                url.searchParams.set('wt', 'csv');
+                break;
             default:
                 break;
         }
@@ -62,12 +67,19 @@ module.exports = {
         checkRespStatus(response);
 
         if (stream) {
+            if (format === 'EXCEL') {
+                const excelTransformStream = new ExcelSafeStreamTransform();
+                return prependBOM(response.body.pipe(excelTransformStream));
+            }
             return response.body;
         }
         let body;
 
         if (format === 'CSV') {
             body = await response.text();
+        } else if (format === 'EXCEL') {
+            body = await response.text();
+            body = BOM + excelSafeStringTransform(body);
         } else {
             body = await response.json();
             if (docsOnly) {
