@@ -89,4 +89,22 @@ module.exports = {
 
         return body;
     },
+
+    deleteDoc: async (docId, collection) => {
+        const url = `${config.SOLRCONFIG.url}${collection}/update`;
+        const body = { delete: { query: `iati_activities_document_id:${docId}` } };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Basic ${Buffer.from(
+                    `${config.SOLRCONFIG.user}:${config.SOLRCONFIG.password}`,
+                    'binary'
+                ).toString('base64')}`,
+            },
+        });
+        checkRespStatus(response);
+    },
 };
