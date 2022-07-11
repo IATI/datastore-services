@@ -34,7 +34,7 @@
         "*.{js,css,md}": "prettier --write"
     },
     "engines": {
-        "node": ">=14 <15",
-        "npm": ">=7"
+        "node": ">=16 <17",
+        "npm": ">=8"
     }
 }
