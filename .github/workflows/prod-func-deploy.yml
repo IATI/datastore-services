@@ -9,7 +9,6 @@ env:
   STAGE: prod # suffix to indicate environment stage
   NAME: func-datastore-services
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
-  NODE_VERSION: '14.x' # set this to the node version to use
   AZURE_CREDENTIALS: ${{ secrets.PROD_AZURE_CREDENTIALS }}
   PGDATABASE: ${{ secrets.PGDATABASE_PROD }}
   PGHOST: ${{ secrets.PGHOST_PROD }}
@@ -32,10 +31,10 @@ jobs:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v3
 
-      - name: 'Setup Node ${{ env.NODE_VERSION }} Environment'
+      - name: 'Setup Node Environment'
         uses: actions/setup-node@v3.3.0
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: '.nvmrc'
           cache: 'npm'
 
       - name: 'Resolve Project Dependencies Using Npm'
@@ -44,7 +43,7 @@ jobs:
           npm i -g npm
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm set-script prepare ""
-          npm install --production
+          npm ci --production
           popd
 
       - name: 'Login via Azure CLI'
@@ -58,6 +57,11 @@ jobs:
           app-name: ${{env.NAME}}-${{env.STAGE}}
           app-settings-json: |
             [
+                {
+                    "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                    "value": "~16",
+                    "slotSetting": false
+                },
                 {
                     "name": "PGDATABASE",
                     "value": "${{ env.PGDATABASE }}",
