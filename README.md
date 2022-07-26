@@ -6,7 +6,7 @@
 -   Node LTS
     -   This will be the latest LTS version supported by Azure Functions, set in `.nvmrc`
     -   once you've installed nvm run `nvm use` which will look at `.nvmrc` for the node version, if it's not installed then it will prompt you to install it with `nvm install <version> --latest-npm`
--   npm >=7
+-   npm >=8
     -   nvm will install the version of npm packaged with node. make sure to use the `--latest-npm` flag to get the latest version
     -   If you forgot to do that install the latest version of npm with `npm i -g npm`
 -   [Azure Functions Core Tools v3](https://github.com/Azure/azure-functions-core-tools)
@@ -59,7 +59,11 @@ PGUSER=<username>@<host>
 SOLR_URL=
 SOLR_USERNAME=
 SOLR_PASSWORD=
+```
 
+The DOWNLOAD_CONTAINER_NAME must be a container with Public Access for Blobs to allow unauthenticated download from the browser.
+
+```
 STORAGE_CONNECTION_STRING=
 DOWNLOAD_CONTAINER_NAME=
 ```
@@ -230,17 +234,13 @@ Example
 
 `func new --name <routename> --template "HTTP trigger" --authlevel "Function"`
 
-## AppInsights SDK
-
--   An example of using the `config/appInsights.js` utility is available in the `pvt-get/index.js` where execution time of the function is measured and then logged in 2 ways to the AppInsights Telemetry.
-
 ## Integration Tests
 
 ### Running
 
 -   Install newman globally `npm i -g newman`
 -   Start function `npm start`
--   Run Tests `npm test`
+-   Run Tests `npm run int:test`
 
 ### Modifying/Adding
 
@@ -249,29 +249,4 @@ Import the `integrations-tests/azure-function-node-microservice-template.postman
 
 ## Deployment
 
--   Update relevant items in `.github/workflows/develop-func-deploy.yml` (see comments inline)
--   Create a [Service Principal](https://github.com/IATI/IATI-Internal-Wiki/blob/main/IATI-Unified-Infra/ServicePrincipals.md) and set the DEV_AZURE_CREDENTIALS GitHub Secret
-
-## Redis-cli
-
-Connect to local Redis instance cli
-`redis-cli`
-
-Connect CLI to Azure
-`redis-cli -h $REDIS_HOSTNAME -p $REDIS_PORT -a $REDIS_KEY --tls`
-
-Check value for a key
-`get <key>`
-
-## API Keys in Key Vault
-
-Setting the following Environment variables on the App Service instance enables the API keys to be stored in Key Vault instead of the file storage account associated with the Function.
-`AzureWebJobsSecretStorageType`=keyvault
-`AzureWebJobsSecretStorageKeyVaultName`= ${{ secrets.`ENV`_KEY_VAULT_NAME }}
-
-You will need to turn on the System Assigned Managed Identity for the Function App:
-Function App > Settings > Identity
-
-Then you will also need to allow the Function to access the Key Vault by adding an [Access Policy](https://portal.azure.com/#@iatitech.onmicrosoft.com/resource/subscriptions/bcaf7a00-7a14-4932-ac41-7bb0dee0d2a9/resourceGroups/rg-sharedresources-dev/providers/Microsoft.KeyVault/vaults/kv-iati-dev/access_policies)
-
--   Secret - Get, List, Set, Delete
+Follows the [IATI Development Process](https://github.com/IATI/IATI-Internal-Wiki#development-process)

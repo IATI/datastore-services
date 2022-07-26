@@ -52,6 +52,7 @@ module.exports = {
                 break;
             case 'EXCEL':
                 url.searchParams.set('wt', 'csv');
+                url.searchParams.set('csv.mv.separator', '|');
                 break;
             default:
                 break;
