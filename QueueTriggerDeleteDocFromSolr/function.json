@@ -1,0 +1,11 @@
+{
+    "bindings": [
+        {
+            "name": "deleteMsg",
+            "type": "queueTrigger",
+            "direction": "in",
+            "queueName": "delete-doc-from-solr",
+            "connection": "AzureWebJobsStorage"
+        }
+    ]
+}
