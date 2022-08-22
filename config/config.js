@@ -5,7 +5,6 @@ module.exports = {
     APP_NAME: 'Datastore services',
     VERSION: version,
     NODE_ENV: process.env.NODE_ENV,
-    APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
     NS_PER_SEC: 1e9,
     PGCONFIG: {
         host: process.env.PGHOST,

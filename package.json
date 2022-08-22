@@ -11,7 +11,6 @@
     "author": "IATI",
     "dependencies": {
         "@azure/storage-blob": "^12.11.0",
-        "applicationinsights": "^2.3.3",
         "chardet": "^1.4.0",
         "dotenv": "^16.0.1",
         "durable-functions": "^2.0.2",
@@ -21,7 +20,7 @@
     },
     "devDependencies": {
         "@prettier/plugin-xml": "^2.2.0",
-        "eslint": "^8.20.0",
+        "eslint": "^8.22.0",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-import": "^2.26.0",
