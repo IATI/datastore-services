@@ -1,28 +1,29 @@
-const { Pool } = require('pg');
-const config = require('../config/config');
+import pg from 'pg';
+import config from '../config/config.js';
 
-module.exports = {
-    query: async (sql, values = null) => {
-        const pool = new Pool(config.PGCONFIG);
-        const result = await pool.query(sql, values);
-        await pool.end();
+const { Pool } = pg;
 
-        return result.rows;
-    },
+const query = async (sql, values = null) => {
+    const pool = new Pool(config.PGCONFIG);
+    const result = await pool.query(sql, values);
+    await pool.end();
 
-    getFirstRow: async (sql, values = null) => {
-        const pool = new Pool(config.PGCONFIG);
-        const result = await pool.query(sql, values);
-        await pool.end();
+    return result.rows;
+};
 
-        if (result.rows.length > 0) {
-            return result.rows[0];
-        }
-        return null;
-    },
+const getFirstRow = async (sql, values = null) => {
+    const pool = new Pool(config.PGCONFIG);
+    const result = await pool.query(sql, values);
+    await pool.end();
 
-    reIndexSolrForIds: async (ids) => {
-        const sql = `
+    if (result.rows.length > 0) {
+        return result.rows[0];
+    }
+    return null;
+};
+
+const reIndexSolrForIds = async (ids) => {
+    const sql = `
         UPDATE document
         SET 
             solrize_reindex = 't'
@@ -30,38 +31,38 @@ module.exports = {
             id = ANY($1);
         `;
 
-        const result = await module.exports.query(sql, [ids]);
+    const result = await query(sql, [ids]);
 
-        return result;
-    },
+    return result;
+};
 
-    reIndexSolrAll: async () => {
-        const pool = new Pool(config.PGCONFIG);
-        const client = await pool.connect();
+const reIndexSolrAll = async () => {
+    const pool = new Pool(config.PGCONFIG);
+    const client = await pool.connect();
 
-        try {
-            await client.query('BEGIN');
-            const sql = `
+    try {
+        await client.query('BEGIN');
+        const sql = `
                 UPDATE document
                 SET
                     solrize_reindex = 't'
                 WHERE
                     solrize_end is not Null
                 `;
-            await client.query(sql);
-            await client.query('COMMIT');
-            return;
-        } catch (e) {
-            await client.query('ROLLBACK');
-            throw e;
-        } finally {
-            client.release();
-            await pool.end();
-        }
-    },
+        await client.query(sql);
+        await client.query('COMMIT');
+        return;
+    } catch (e) {
+        await client.query('ROLLBACK');
+        throw e;
+    } finally {
+        client.release();
+        await pool.end();
+    }
+};
 
-    clearFlattenerForIds: async (ids) => {
-        const sql = `
+const clearFlattenerForIds = async (ids) => {
+    const sql = `
         UPDATE document
         SET 
             flatten_api_error = Null,
@@ -72,18 +73,18 @@ module.exports = {
             id = ANY($1);
         `;
 
-        const result = await module.exports.query(sql, [ids]);
+    const result = await query(sql, [ids]);
 
-        return result;
-    },
+    return result;
+};
 
-    clearFlattenerForAll: async () => {
-        const pool = new Pool(config.PGCONFIG);
-        const client = await pool.connect();
+const clearFlattenerForAll = async () => {
+    const pool = new Pool(config.PGCONFIG);
+    const client = await pool.connect();
 
-        try {
-            await client.query('BEGIN');
-            const sql = `
+    try {
+        await client.query('BEGIN');
+        const sql = `
                 UPDATE document
                 SET 
                     flatten_api_error = Null,
@@ -93,15 +94,22 @@ module.exports = {
                 WHERE 
                     flatten_end is not Null and downloaded is not Null
                 `;
-            await client.query(sql);
-            await client.query('COMMIT');
-            return;
-        } catch (e) {
-            await client.query('ROLLBACK');
-            throw e;
-        } finally {
-            client.release();
-            await pool.end();
-        }
-    },
+        await client.query(sql);
+        await client.query('COMMIT');
+        return;
+    } catch (e) {
+        await client.query('ROLLBACK');
+        throw e;
+    } finally {
+        client.release();
+        await pool.end();
+    }
+};
+
+export {
+    clearFlattenerForAll,
+    clearFlattenerForIds,
+    getFirstRow,
+    reIndexSolrForIds,
+    reIndexSolrAll,
 };

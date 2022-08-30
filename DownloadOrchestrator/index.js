@@ -9,9 +9,11 @@
  *    function app in Kudu
  */
 
-const df = require('durable-functions');
+import df from 'durable-functions';
 
-module.exports = df.orchestrator(function* download(context) {
+const downloadOrchestrator = df.orchestrator(function* download(context) {
     // returns output from download function
     return yield context.df.callActivity('Download', context.df.getInput());
 });
+
+export default downloadOrchestrator;

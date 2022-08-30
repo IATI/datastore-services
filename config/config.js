@@ -1,7 +1,9 @@
-require('dotenv').config();
-const { version } = require('../package.json');
+import 'dotenv/config';
+import { readFile } from 'fs/promises';
 
-module.exports = {
+const { version } = JSON.parse(await readFile(new URL('../package.json', import.meta.url)));
+
+const config = {
     APP_NAME: 'Datastore services',
     VERSION: version,
     NODE_ENV: process.env.NODE_ENV,
@@ -25,3 +27,5 @@ module.exports = {
     SOLR_MAX_ROWS: 1000,
     ONE_MEGABYTE: 1024 * 1024,
 };
+
+export default config;

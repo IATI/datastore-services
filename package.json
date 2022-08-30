@@ -2,10 +2,11 @@
     "name": "datastore-services",
     "version": "1.5.1",
     "description": "Datastore utility endpoints",
+    "type": "module",
     "scripts": {
         "start": "func start --javascript",
         "start:verbose": "func start --javascript --verbose",
-        "int:test": "newman run integration-tests/datastore-services-integration-tests.postman_collection.json -e integration-tests/envs/local-function-7071.postman_environment.json",
+        "test": "newman run integration-tests/datastore-services-integration-tests.postman_collection.json -e integration-tests/envs/local-function-7071.postman_environment.json",
         "prepare": "husky install"
     },
     "author": "IATI",
@@ -14,7 +15,7 @@
         "chardet": "^1.4.0",
         "dotenv": "^16.0.1",
         "durable-functions": "^2.0.2",
-        "node-fetch": "^2.6.7",
+        "node-fetch": "^3.2.10",
         "pg": "^8.8.0",
         "uuid": "^8.3.2"
     },
