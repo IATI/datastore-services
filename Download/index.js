@@ -1,8 +1,8 @@
-const { v4: uuidv4 } = require('uuid');
-const { BlobServiceClient } = require('@azure/storage-blob');
-const { PassThrough } = require('stream');
-const { query } = require('../solr/solr');
-const config = require('../config/config');
+import { v4 as uuidv4 } from 'uuid';
+import { BlobServiceClient } from '@azure/storage-blob';
+import { PassThrough } from 'stream';
+import { query } from '../solr/solr.js';
+import config from '../config/config.js';
 
 const contentTypeMap = {
     JSON: 'application/json',
@@ -11,7 +11,7 @@ const contentTypeMap = {
     EXCEL: 'text/plain',
 };
 
-module.exports = async (context) => {
+export default async function download(context) {
     try {
         context.log('Starting Download Function');
         const body = context.bindings.Download;
@@ -57,7 +57,7 @@ module.exports = async (context) => {
         const blobServiceClient = BlobServiceClient.fromConnectionString(
             config.STORAGE_CONNECTION_STRING
         );
-        // set service version so Content-Disposition is returned by Blob API when retreiving
+        // set service version so Content-Disposition is returned by Blob API when retrieving
         await blobServiceClient.setProperties({ defaultServiceVersion: '2020-12-06' });
         const containerClient = blobServiceClient.getContainerClient(
             config.DOWNLOAD_CONTAINER_NAME
@@ -166,4 +166,4 @@ module.exports = async (context) => {
             body: error.message,
         };
     }
-};
+}

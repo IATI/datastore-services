@@ -1,6 +1,6 @@
-const db = require('../database/db');
+import { reIndexSolrForIds } from '../database/db.js';
 
-module.exports = async (context, req) => {
+export default async function pvtPatchDbSolrReindex(context, req) {
     try {
         const { body } = req;
 
@@ -37,7 +37,7 @@ module.exports = async (context, req) => {
             return;
         }
 
-        await db.reIndexSolrForIds(body.ids);
+        await reIndexSolrForIds(body.ids);
 
         context.res = {
             status: 204,
@@ -52,4 +52,4 @@ module.exports = async (context, req) => {
             body: JSON.stringify(e.message),
         };
     }
-};
+}

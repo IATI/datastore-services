@@ -1,4 +1,4 @@
-const { Readable } = require('stream');
+import { Readable } from 'stream';
 
 const BOM = '\ufeff';
 
@@ -50,7 +50,7 @@ class ConcatStream extends Readable {
 }
 /* eslint no-underscore-dangle: 0 */
 
-exports.prependBOM = (stream) => {
+const prependBOM = (stream) => {
     const concat = new ConcatStream();
     const readableBOM = Readable.from([BOM]);
     concat.append(readableBOM);
@@ -58,4 +58,4 @@ exports.prependBOM = (stream) => {
     return concat;
 };
 
-exports.BOM = BOM;
+export { BOM, prependBOM };
