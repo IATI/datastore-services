@@ -152,6 +152,9 @@ jobs:
     needs: build-deploy
     runs-on: ubuntu-latest
     steps:
+      - name: 'Wait for 3 minutes'
+        run: sleep 180
+
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v3
 
