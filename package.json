@@ -17,7 +17,7 @@
         "durable-functions": "^2.0.2",
         "node-fetch": "^3.2.10",
         "pg": "^8.8.0",
-        "uuid": "^8.3.2"
+        "uuid": "^9.0.0"
     },
     "devDependencies": {
         "@prettier/plugin-xml": "^2.2.0",
