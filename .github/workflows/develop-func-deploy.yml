@@ -60,7 +60,7 @@ jobs:
           popd
 
       - name: 'Login via Azure CLI'
-        uses: azure/login@v1.4.5
+        uses: azure/login@v1.4.6
         with:
           creds: ${{ env.AZURE_CREDENTIALS }} # Service Principal credentials saved in GitHub Secrets
 
