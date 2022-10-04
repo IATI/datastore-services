@@ -1,8 +1,8 @@
-const db = require('../database/db');
+import { clearFlattenerForAll } from '../database/db.js';
 
-module.exports = async (context) => {
+export default async function pvtPatchDbClearFlattenerAll(context) {
     try {
-        await db.clearFlattenerForAll();
+        await clearFlattenerForAll();
 
         context.res = {
             status: 204,
@@ -17,4 +17,4 @@ module.exports = async (context) => {
             body: JSON.stringify(e.message),
         };
     }
-};
+}

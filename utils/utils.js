@@ -6,10 +6,12 @@ class HTTPResponseError extends Error {
     }
 }
 
-exports.checkRespStatus = (response) => {
+const checkRespStatus = (response) => {
     if (response.ok) {
         // response.status >= 200 && response.status < 300
         return response;
     }
     throw new HTTPResponseError(response);
 };
+
+export default checkRespStatus;

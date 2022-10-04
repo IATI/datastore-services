@@ -1,5 +1,5 @@
-const { Transform } = require('stream');
-const chardet = require('chardet');
+import { Transform } from 'stream';
+import { detect } from 'chardet';
 
 const findEncoding = (chunk) => {
     const mapping = {
@@ -34,7 +34,7 @@ const findEncoding = (chunk) => {
         IBM420: 'unsupported_by_buffers',
         IBM424: 'unsupported_by_buffers',
     };
-    const encodingGuess = chardet.detect(chunk);
+    const encodingGuess = detect(chunk);
     const encodingMapping = mapping[encodingGuess];
     if (encodingMapping === 'unsupported_by_buffers') {
         return 'utf8'; // To avoid breakages
@@ -134,7 +134,7 @@ class ExcelSafeStreamTransform extends Transform {
 }
 /* eslint no-underscore-dangle: 0 */
 
-exports.excelSafeStringTransform = (chunkStr, truncLength = 32700) => {
+function excelSafeStringTransform(chunkStr, truncLength = 32700) {
     const sep = ',';
     const newLine = '\n';
     const escapeChar = '\\';
@@ -203,6 +203,6 @@ exports.excelSafeStringTransform = (chunkStr, truncLength = 32700) => {
         }
     }
     return pushStr;
-};
+}
 
-exports.ExcelSafeStreamTransform = ExcelSafeStreamTransform;
+export { excelSafeStringTransform, ExcelSafeStreamTransform };

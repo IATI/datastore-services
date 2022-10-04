@@ -1,6 +1,6 @@
-const { createCollection, createOrUpdateAlias } = require('../solr/solr');
+import { createCollection, createOrUpdateAlias } from '../solr/solr.js';
 
-module.exports = async (context, req) => {
+export default async function pvtPostSolrCreateCollection(context, req) {
     try {
         const { body } = req;
 
@@ -76,4 +76,4 @@ module.exports = async (context, req) => {
             body,
         };
     }
-};
+}
