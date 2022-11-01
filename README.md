@@ -230,6 +230,12 @@ Example
 }
 ```
 
+### Download Formats request strategy
+
+-   XML - Have to paginate with SOLR_MAX_ROWS as max rows requested in one call as requesting all rows in one call caused Solr to return 5xx errors
+    -   This is likely due to using either Velocity or XSLT response writer to generate the raw XML
+-   JSON, CSV, EXCEL - Requests all rows in one call and streams directly to the Blob storage. Solr seems to be able to handle requesting all rows well for these so we can just stream the response directly for all rows.
+
 ## Creating a new route
 
 `func new --name <routename> --template "HTTP trigger" --authlevel "Function"`
