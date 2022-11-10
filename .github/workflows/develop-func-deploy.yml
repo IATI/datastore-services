@@ -51,6 +51,11 @@ jobs:
         with:
           name: build-artifact-dev
 
+      - name: Unzip build artifact
+        run: |
+          unzip build-artifact-dev.zip
+          rm build-artifact-dev.zip
+
       - name: 'Login via Azure CLI'
         uses: azure/login@v1.4.6
         with:
