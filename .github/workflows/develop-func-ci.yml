@@ -10,7 +10,9 @@ on:
 
 jobs:
   build:
-    uses: IATI/.github/.github/workflows/build_node.yaml@main
+    uses: IATI/.github/.github/workflows/build_node_save.yaml@main
+    with:
+      save_artifact: false
 
   automerge:
     needs: build
