@@ -1,6 +1,6 @@
 {
     "name": "datastore-services",
-    "version": "1.5.2",
+    "version": "1.6.0",
     "description": "Datastore utility endpoints",
     "type": "module",
     "scripts": {
