@@ -106,7 +106,52 @@ const clearFlattenerForAll = async () => {
     }
 };
 
+const clearLakifyForIds = async (ids) => {
+    const sql = `
+        UPDATE document
+        SET
+            lakify_start = Null,
+            lakify_end = Null,
+            lakify_error = Null
+        WHERE
+            id = ANY($1);
+        `;
+
+    const result = await query(sql, [ids]);
+
+    return result;
+};
+
+const clearLakifyForAll = async () => {
+    const pool = new Pool(config.PGCONFIG);
+    const client = await pool.connect();
+
+    try {
+        await client.query('BEGIN');
+        const sql = `
+                UPDATE document
+                SET
+                    lakify_start = Null,
+                    lakify_end = Null,
+                    lakify_error = Null
+                WHERE
+                    lakify_end is not Null and downloaded is not Null
+                `;
+        await client.query(sql);
+        await client.query('COMMIT');
+        return;
+    } catch (e) {
+        await client.query('ROLLBACK');
+        throw e;
+    } finally {
+        client.release();
+        await pool.end();
+    }
+};
+
 export {
+    clearLakifyForAll,
+    clearLakifyForIds,
     clearFlattenerForAll,
     clearFlattenerForIds,
     getFirstRow,

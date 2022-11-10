@@ -16,7 +16,6 @@ on:
 env:
   STAGE: dev # suffix to indicate environment stage
   NAME: func-datastore-services
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
   AZURE_CREDENTIALS: ${{ secrets.DEV_AZURE_CREDENTIALS }}
   PGDATABASE: ${{ secrets.PGDATABASE_DEV }}
   PGHOST: ${{ secrets.PGHOST_DEV }}
@@ -36,28 +35,27 @@ jobs:
   should_run:
     uses: IATI/.github/.github/workflows/should_run.yaml@main
 
-  build-deploy:
+  build_save:
     needs: should_run
     if: ${{ needs.should_run.outputs.should_run == 'true' }}
+    uses: IATI/.github/.github/workflows/build_node_save.yaml@main
+    with:
+      save_artifact: true
+      artifact_name: build-artifact-dev
+
+  deploy:
+    needs: build_save
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout GitHub Action'
-        uses: actions/checkout@v3
-
-      - name: 'Setup Node Environment'
-        uses: actions/setup-node@v3.5.0
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          name: build-artifact-dev
 
-      - name: 'Resolve Project Dependencies Using Npm'
-        shell: bash
+      - name: Unzip build artifact
         run: |
-          npm i -g npm
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          npm set-script prepare ""
-          npm ci --production
-          popd
+          unzip build-artifact-dev.zip
+          rm build-artifact-dev.zip
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1.4.6
@@ -143,13 +141,12 @@ jobs:
             ]
 
       - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1.4.7
+        uses: Azure/functions-action@v1.4.8
         with:
           app-name: ${{ env.NAME }}-${{ env.STAGE }}
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
 
   integration-test:
-    needs: build-deploy
+    needs: deploy
     runs-on: ubuntu-latest
     steps:
       - name: 'Wait for 3 minutes'
@@ -171,11 +168,11 @@ jobs:
 
   # Mark status checks success/fail on dependabot commits for scheduled deploys
   status_check_success:
-    needs: [build-deploy, integration-test]
+    needs: [deploy, integration-test]
     if: success() && github.event_name == 'schedule'
     uses: IATI/.github/.github/workflows/status_check_success.yaml@main
 
   status_check_failure:
-    needs: [build-deploy, integration-test]
+    needs: [deploy, integration-test]
     if: failure() && github.event_name == 'schedule'
     uses: IATI/.github/.github/workflows/status_check_failure.yaml@main
