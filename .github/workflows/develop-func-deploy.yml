@@ -38,7 +38,7 @@ jobs:
   build_save:
     needs: should_run
     if: ${{ needs.should_run.outputs.should_run == 'true' }}
-    uses: IATI/.github/.github/workflows/build_node_save.yaml
+    uses: IATI/.github/.github/workflows/build_node_save.yaml@main
     with:
       artifact: ${{ env.NAME }}-${{ env.STAGE }}-build
 
