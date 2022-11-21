@@ -1,5 +1,9 @@
 # datastore-services
 
+## Endpoints
+
+See OpenAPI specification `postman/schemas/index.yaml`. To view locally in Swagger UI, you can use the `42crunch.vscode-openapi` VSCode extension.
+
 ## Prerequisities
 
 -   nvm - [nvm](https://github.com/nvm-sh/nvm) - Node version manager
@@ -103,92 +107,11 @@ let myEnvVariable = config.ENV_VAR
 -   This is done with eslint following the airbnb-base style and using [Prettier](https://prettier.io). Implemented with [this](https://sourcelevel.io/blog/how-to-setup-eslint-and-prettier-on-node) guide.
 -   If you use VSCode the formatting will happen automagically on save due to the `.vscode/settings.json` > `"editor.formatOnSave": true` setting
 
-## Endpoints /api
-
-### `GET /pub/version`
-
--   Returns application version from `package.json`
-
-```
-<0.0.0>
-```
-
-### `PATCH pvt/db/solr-reindex`
-
--   Request
-
-```json
-{ "ids": ["74790f8d-29f7-4bda-afa9-b46070dfc276", "547d7d97-9330-4938-bc4b-f64c3844be23"] }
-```
-
--   Returns
-
-204 Response
-
-### `PATCH /pvt/db/solr-reindex/all`
-
--   Returns
-
-204 Response
-
-### `PATCH /pvt/db/clear-flattener`
-
--   Request
-
-```json
-{ "ids": ["74790f8d-29f7-4bda-afa9-b46070dfc276", "547d7d97-9330-4938-bc4b-f64c3844be23"] }
-```
-
--   Returns
-
-204 Response
-
-### `PATCH /pvt/db/clear-flattener/all`
-
--   Returns
-
-204 Response
-
-### `POST /pvt/solr/create-collections`
-
-Creates new collections named `collection.name_newVersion`, aliases to `collection.alias`
-
--   Request
-
-```json
-{
-  "newVersion": "4",
-  "collections": [
-    {
-      "name": "activity",
-      "config": {
-        "collection.configName": "activity_configset_4",
-        "numShards": 1,
-        "replicationFactor": 1
-      },
-      "alias": "activity_solrize"
-    },
-    {
-      "name": "budget",
-      "config": {
-        "collection.configName": "budget_configset_4",
-        "numShards": 1,
-        "replicationFactor": 1
-      },
-      "alias": "budget_solrize"
-    }
-    ...
-  ]
-}
-```
-
-Also see [exampleRequest.json](./pvt-post-solr-create-collections/exampleRequest.json)
-
--   Returns
-
-204 Response
+## Endpoints notes
 
 ### `POST /pvt/orchestrators/DownloadOrchestrator`
+
+https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview?tabs=csharp#async-http
 
 Downloads the provided Solr query to Azure Blobs and returns URL where it can be downloaded from.
 

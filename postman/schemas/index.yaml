@@ -1,0 +1,382 @@
+openapi: '3.0.0'
+info:
+    version: '1.6.0'
+    title: 'datastore-services'
+    description: API to convert and flatten IATI activities documents for indexing into Solr
+
+servers:
+    - url: 'http://localhost:7071'
+      description: Local Function
+    - url: 'https://func-datastore-services-dev.azurewebsites.net'
+      description: Dev environment Function (requires auth)
+    - url: 'https://func-datastore-services-prod.azurewebsites.net'
+      description: Production environment Function (requires auth)
+
+paths:
+    /api/pvt/version:
+        get:
+            summary: GET application version
+            responses:
+                200:
+                    description: Version of the application in semver format
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: 1.0.7
+                401:
+                    $ref: '#/components/responses/UnauthorizedError'
+                500:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /api/pvt/db/clear-flattener:
+        patch:
+            summary: Clear flattener columns to reflatten a document
+            requestBody:
+                description: The list of document ids to clear flattener columns for
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DocumentIdsArray'
+            responses:
+                204:
+                    description: Success
+                400:
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                            examples:
+                                noIdsKey:
+                                    value:
+                                        error: 'Body must contain a key "ids"'
+                                badIdsFormat:
+                                    value:
+                                        error: '"ids" must be an Array of document ids'
+                                noBodyError:
+                                    value:
+                                        error: 'No Body'
+                401:
+                    $ref: '#/components/responses/UnauthorizedError'
+                500:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /api/pvt/db/clear-flattener/all:
+        patch:
+            summary: Clear flattener columns to reflatten ALL documents
+            responses:
+                204:
+                    description: Success
+                401:
+                    $ref: '#/components/responses/UnauthorizedError'
+                500:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /api/pvt/db/clear-lakify:
+        patch:
+            summary: Clear lakify columns to relakify a document
+            requestBody:
+                description: The list of document ids to clear lakify columns for
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DocumentIdsArray'
+            responses:
+                204:
+                    description: Success
+                400:
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                            examples:
+                                noIdsKey:
+                                    value:
+                                        error: 'Body must contain a key "ids"'
+                                badIdsFormat:
+                                    value:
+                                        error: '"ids" must be an Array of document ids'
+                                noBodyError:
+                                    value:
+                                        error: 'No Body'
+                401:
+                    $ref: '#/components/responses/UnauthorizedError'
+                500:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /api/pvt/db/clear-lakify/all:
+        patch:
+            summary: Clear lakify columns to relakify ALL documents
+            responses:
+                204:
+                    description: Success
+                401:
+                    $ref: '#/components/responses/UnauthorizedError'
+                500:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /api/pvt/db/solr-reindex:
+        patch:
+            summary: Clear solrize columns to reindex a document into solr
+            requestBody:
+                description: The list of document ids to reindex
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DocumentIdsArray'
+            responses:
+                204:
+                    description: Success
+                400:
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                            examples:
+                                noIdsKey:
+                                    value:
+                                        error: 'Body must contain a key "ids"'
+                                badIdsFormat:
+                                    value:
+                                        error: '"ids" must be an Array of document ids'
+                                noBodyError:
+                                    value:
+                                        error: 'No Body'
+                401:
+                    $ref: '#/components/responses/UnauthorizedError'
+                500:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /api/pvt/db/solr-reindex/all:
+        patch:
+            summary: Clear solrize columns to reindex ALL documents
+            responses:
+                204:
+                    description: Success
+                401:
+                    $ref: '#/components/responses/UnauthorizedError'
+                500:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /api/pvt/solr/create-collections:
+        post:
+            summary: Create new collections in solr for a reindex
+            requestBody:
+                description: The configuration information for the new collections
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                newVersion:
+                                    type: integer
+                                collections:
+                                    type: array
+                                    items:
+                                        description: new collections to create
+                                        type: object
+                                        properties:
+                                            name:
+                                                description: collection name
+                                                type: string
+                                            alias:
+                                                description: solrize alias
+                                                type: string
+                                            config:
+                                                type: object
+                                                properties:
+                                                    collection.configName:
+                                                        type: string
+                                                    numShards:
+                                                        type: integer
+                                                    replicationFactor:
+                                                        type: integer
+                            example:
+                                newVersion: 2
+                                collections:
+                                    - name: activity
+                                      alias: activity_solrize
+                                      config:
+                                          collection.configName: 'activity_configset_2'
+                                          numShards: 1
+                                          replicationFactor: 1
+                                    - name: budget
+                                      alias: budget_solrize
+                                      config:
+                                          collection.configName: 'budget_configset_2'
+                                          numShards: 1
+                                          replicationFactor: 1
+                                    - name: transaction
+                                      alias: transaction_solrize
+                                      config:
+                                          collection.configName: 'transaction_configset_2'
+                                          numShards: 1
+                                          replicationFactor: 1
+            responses:
+                204:
+                    description: Success
+                400:
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                            examples:
+                                noIdsKey:
+                                    value:
+                                        error: 'Body must contain a key "<key>"'
+                                badCollectionsFormat:
+                                    value:
+                                        error: '"collections" must be an Array of collection objects'
+                                noBodyError:
+                                    value:
+                                        error: 'No Body'
+                401:
+                    $ref: '#/components/responses/UnauthorizedError'
+                500:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /api/orchestrators/DownloadOrchestrator:
+        post:
+            summary: Downloads the provided Solr query to Azure Blobs and returns URL where it can be downloaded from. Uses https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview?tabs=csharp#async-http pattern.
+            requestBody:
+                description: The query and format to download
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                query:
+                                    description: The Solr query to request for download
+                                    type: string
+                                format:
+                                    description: The format to save the download in
+                                    type: string
+                                    example:
+                                        enum:
+                                            - 'JSON'
+                                            - 'XML'
+                                            - 'CSV'
+                                            - 'EXCEL'
+            responses:
+                202:
+                    description: Accepted
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/OrchestratorResponse'
+                401:
+                    $ref: '#/components/responses/UnauthorizedError'
+                500:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+components:
+    responses:
+        UnauthorizedError:
+            description: API key is missing or invalid
+    schemas:
+        DocumentIdsArray:
+            type: object
+            properties:
+                ids:
+                    type: array
+                    items:
+                        description: document ids
+                        type: string
+                        example: '971828f5-d7ca-40b5-ae38-2fd4c11846e0'
+        Error:
+            type: object
+            required:
+                - error
+            properties:
+                error:
+                    description: A human readable error message
+                    type: string
+        ResponseMessage:
+            type: object
+            required:
+                - message
+            properties:
+                message:
+                    description: A human readable response message
+                    type: string
+        OrchestratorResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                statusQueryGetUri:
+                    type: string
+                sendEventPostUri:
+                    type: string
+                terminatePostUri:
+                    type: string
+                rewindPostUri:
+                    type: string
+                purgeHistoryDeleteUri:
+                    type: string
+                restartPostUri:
+                    type: string
+                suspendPostUri:
+                    type: string
+                resumePostUri:
+                    type: string
+            additionalProperties: false
+            required:
+                - id
+                - statusQueryGetUri
+                - sendEventPostUri
+                - terminatePostUri
+                - rewindPostUri
+                - purgeHistoryDeleteUri
+                - restartPostUri
+                - suspendPostUri
+                - resumePostUri
+    securitySchemes:
+        ApiKeyHeader:
+            type: apiKey
+            in: header
+            name: x-functions-key
+        ApiKeyQuery:
+            type: apiKey
+            in: query
+            name: x-functions-key
+security:
+    - ApiKeyHeader: []
+    - ApiKeyQuery: []
