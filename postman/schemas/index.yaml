@@ -2,7 +2,7 @@ openapi: '3.0.0'
 info:
     version: '1.6.0'
     title: 'datastore-services'
-    description: API to convert and flatten IATI activities documents for indexing into Solr
+    description: Service and utility endpoints for the IATI Datastore
 
 servers:
     - url: 'http://localhost:7071'
