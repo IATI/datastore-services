@@ -104,6 +104,13 @@ export default async function download(context) {
 
             queryUrl.searchParams.set('rows', config.SOLR_MAX_ROWS);
 
+            const uploadResponsePromise = blockBlobClient.uploadStream(
+                uploadStream,
+                uploadOptions.bufferSize,
+                uploadOptions.maxBuffers,
+                uploadConfig
+            );
+
             do {
                 context.log(
                     `Downloading ${start}-${
@@ -129,12 +136,7 @@ export default async function download(context) {
             uploadStream.write(footer);
             uploadStream.end();
 
-            uploadResponse = await blockBlobClient.uploadStream(
-                uploadStream,
-                uploadOptions.bufferSize,
-                uploadOptions.maxBuffers,
-                uploadConfig
-            );
+            uploadResponse = await uploadResponsePromise;
         } else {
             // JSON, CSV, EXCEL - request all rows and stream directly to blob
             queryUrl.searchParams.set('rows', numFound);
