@@ -15,7 +15,7 @@ servers:
 paths:
     /api/pvt/version:
         get:
-            summary: GET application version
+            summary: Returns application version.
             responses:
                 200:
                     description: Version of the application in semver format
@@ -34,7 +34,8 @@ paths:
                                 $ref: '#/components/schemas/Error'
     /api/pvt/db/clear-flattener:
         patch:
-            summary: Clear flattener columns to reflatten a document
+            summary: Reflatten a document.
+            description: Clears the appropriate columns in the Unified Platform database so that the `flattener` container service processes the document to flatten it again.
             requestBody:
                 description: The list of document ids to clear flattener columns for
                 required: true
@@ -71,7 +72,10 @@ paths:
                                 $ref: '#/components/schemas/Error'
     /api/pvt/db/clear-flattener/all:
         patch:
-            summary: Clear flattener columns to reflatten ALL documents
+            summary: Reflatten ALL documents.
+            description: >
+                **Use with Caution**
+                  - Clears the appropriate columns in the Unified Platform database so that the `flattener` container service processes all documents to flatten them again.
             responses:
                 204:
                     description: Success
@@ -85,7 +89,8 @@ paths:
                                 $ref: '#/components/schemas/Error'
     /api/pvt/db/clear-lakify:
         patch:
-            summary: Clear lakify columns to relakify a document
+            summary: Relakify a document.
+            description: Clears the appropriate columns in the Unified Platform database so that the `lakify` container service processes the document to lakify it again.
             requestBody:
                 description: The list of document ids to clear lakify columns for
                 required: true
@@ -122,7 +127,10 @@ paths:
                                 $ref: '#/components/schemas/Error'
     /api/pvt/db/clear-lakify/all:
         patch:
-            summary: Clear lakify columns to relakify ALL documents
+            summary: Relakify ALL documents.
+            description: >
+                **Use with Caution**
+                  - Clears the appropriate columns in the Unified Platform database so that the `lakify` container service processes ALL documents to relakify them again.
             responses:
                 204:
                     description: Success
@@ -136,7 +144,8 @@ paths:
                                 $ref: '#/components/schemas/Error'
     /api/pvt/db/solr-reindex:
         patch:
-            summary: Clear solrize columns to reindex a document into solr
+            summary: Reindex (resolrize) a document.
+            description: Sets a flag in the Unified Platform database so that the `solrize` container service processes the document to reindex it into Solr.
             requestBody:
                 description: The list of document ids to reindex
                 required: true
@@ -173,7 +182,10 @@ paths:
                                 $ref: '#/components/schemas/Error'
     /api/pvt/db/solr-reindex/all:
         patch:
-            summary: Clear solrize columns to reindex ALL documents
+            summary: Reindex (resolrize) ALL documents.
+            description: >
+                **Use with Caution**
+                  - Sets flags in the Unified Platform database so that the `solrize` container service processes ALL documents to reindex them into Solr.
             responses:
                 204:
                     description: Success
@@ -187,7 +199,7 @@ paths:
                                 $ref: '#/components/schemas/Error'
     /api/pvt/solr/create-collections:
         post:
-            summary: Create new collections in solr for a reindex
+            summary: Create new collections in Solr for a reindex.
             requestBody:
                 description: The configuration information for the new collections
                 required: true
@@ -269,7 +281,8 @@ paths:
                                 $ref: '#/components/schemas/Error'
     /api/orchestrators/DownloadOrchestrator:
         post:
-            summary: Downloads the provided Solr query to Azure Blobs and returns URL where it can be downloaded from. Uses https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview?tabs=csharp#async-http pattern.
+            summary: Downloads a Solr query.
+            description: Downloads the provided Solr query in the specified format to Azure Blobs and returns URL where it can be downloaded from. Uses Azure Functions [async-http](https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview?tabs=javascript#async-http) pattern.
             requestBody:
                 description: The query and format to download
                 required: true
