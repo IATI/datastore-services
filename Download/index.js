@@ -93,7 +93,6 @@ export default async function download(context) {
 
         if (body.format === 'XML') {
             // XML - have to wrap in <iati-activities> and paginate to download raw iati xml from solr
-            let start = 0;
             const date = new Date();
             const header = `<?xml version="1.0" encoding="UTF-8"?>\n<iati-activities version="2.03" generated-datetime="${date.toISOString()}">\n`;
             const footer = '</iati-activities>';
@@ -103,6 +102,8 @@ export default async function download(context) {
             uploadStream.write(header);
 
             queryUrl.searchParams.set('rows', config.SOLR_MAX_ROWS);
+            // only fetch iati_xml field with raw XML
+            queryUrl.searchParams.set('fl', 'iati_xml');
 
             const uploadResponsePromise = blockBlobClient.uploadStream(
                 uploadStream,
@@ -111,27 +112,25 @@ export default async function download(context) {
                 uploadConfig
             );
 
+            // paginate over results using cursorMark
+            let currentCursorMark = '*';
+            let done = false;
             do {
-                context.log(
-                    `Downloading ${start}-${
-                        start + config.SOLR_MAX_ROWS < numFound
-                            ? start + config.SOLR_MAX_ROWS
-                            : numFound
-                    } rows of total: ${numFound}`
-                );
-                queryUrl.searchParams.set('start', start);
+                queryUrl.searchParams.set('cursorMark', currentCursorMark);
 
-                // only fetch iati_xml
-                queryUrl.searchParams.set('fl', 'iati_xml');
                 // eslint-disable-next-line no-await-in-loop
-                const formattedResponse = await query(queryUrl, body.format, true);
-
-                formattedResponse.forEach((doc) => {
+                const formattedResponse = await query(queryUrl, body.format, false);
+                formattedResponse.response.docs.forEach((doc) => {
                     uploadStream.write(doc.iati_xml);
                 });
 
-                start += config.SOLR_MAX_ROWS;
-            } while (start < numFound);
+                const { nextCursorMark } = formattedResponse;
+                if (nextCursorMark === currentCursorMark) {
+                    done = true;
+                } else {
+                    currentCursorMark = nextCursorMark;
+                }
+            } while (!done);
 
             uploadStream.write(footer);
             uploadStream.end();
