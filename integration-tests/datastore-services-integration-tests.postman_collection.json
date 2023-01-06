@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "cfae2a04-a74e-48ad-bf80-f81e28075d74",
+		"_postman_id": "ccce44b4-f339-4cba-ae35-ee1ef20e5df5",
 		"name": "datastore-services-integration-tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "13097277"
@@ -418,6 +418,68 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"GB-COH-06368740-P0055\\\"&fl=iati_identifier,reporting_org_ref,reporting_org_type\",\n    \"format\": \"XML\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"orchestrators",
+												"DownloadOrchestrator"
+											]
+										},
+										"description": "42.75 MiB"
+									},
+									"response": []
+								},
+								{
+									"name": "Download Solr Query - Test Pagination (Only for XML response format)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+													"",
+													"pm.test(\"Number of results found to be greater than 1000 activities to ensure pagination is happening\", function () {",
+													"    pm.expect(statusResponse.output.solrResponseMeta.numFound).to.be.greaterThan(1000)",
+													"});",
+													"",
+													"// HEAD request to blob URL, check response, header and size",
+													"const downloadHeadReq = {",
+													"    url: statusResponse.output.url,",
+													"    method: 'HEAD'",
+													"}",
+													"",
+													"pm.sendRequest(downloadHeadReq, function (err, response) {",
+													"    pm.test(\"File download status code is 200\", function () {",
+													"        pm.expect(response.code).to.eql(200);",
+													"    });",
+													"    pm.test(\"File download Content-Disposition header is present and contains 'attachment'\", function () {",
+													"        pm.expect(response.headers.find(h => h.key == \"Content-Disposition\").value).to.contain('attachment');",
+													"    });",
+													"    const fileSize = response.headers.find(h => h.key == \"Content-Length\").value / (1024*1024)",
+													"    const { format } = statusResponse.output.req",
+													"    console.log(`${format} File Size (MiB): ${fileSize}`)",
+													"});",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"query\": \"activity/search?q=sector_code:11120\",\n    \"format\": \"XML\"\n}",
 											"options": {
 												"raw": {
 													"language": "json"
