@@ -96,6 +96,7 @@ export default async function download(context) {
             const date = new Date();
             const header = `<?xml version="1.0" encoding="UTF-8"?>\n<iati-activities version="2.03" generated-datetime="${date.toISOString()}">\n`;
             const footer = '</iati-activities>';
+            const newline = '\n';
 
             const uploadStream = new PassThrough();
 
@@ -124,6 +125,7 @@ export default async function download(context) {
                 const formattedResponse = await query(queryUrl, body.format, false);
                 formattedResponse.response.docs.forEach((doc) => {
                     uploadStream.write(doc.iati_xml);
+                    uploadStream.write(newline);
                 });
 
                 const { nextCursorMark } = formattedResponse;
