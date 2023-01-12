@@ -399,7 +399,7 @@
 													"        pm.expect(xml).to.contain(`<?xml version=\"1.0\" encoding=\"UTF-8\"?>`)",
 													"    })",
 													"    pm.test(\"XML File contains expected xml closing tags\", function () {",
-													"        pm.expect(xml).to.contain(`</iati-activity></iati-activities>`)",
+													"        pm.expect(xml).to.contain(`</iati-activity>\n</iati-activities>`)",
 													"    })",
 													"    pm.test(\"XML File contains expected iati-identifier\", function () {",
 													"        console.log(jsonObject['iati-activities']['iati-activity']['iati-identifier'])",
