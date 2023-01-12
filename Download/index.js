@@ -88,7 +88,7 @@ export default async function download(context) {
 
         // add sort if not present
         if (!queryUrl.searchParams.has('sort')) {
-            queryUrl.searchParams.set('sort', 'id desc');
+            queryUrl.searchParams.set('sort', 'id asc');
         }
 
         if (body.format === 'XML') {
@@ -104,6 +104,8 @@ export default async function download(context) {
             queryUrl.searchParams.set('rows', config.SOLR_MAX_ROWS);
             // only fetch iati_xml field with raw XML
             queryUrl.searchParams.set('fl', 'iati_xml');
+            // unique field required for cursorMark
+            queryUrl.searchParams.set('sort', 'id asc');
 
             const uploadResponsePromise = blockBlobClient.uploadStream(
                 uploadStream,
