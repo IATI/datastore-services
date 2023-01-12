@@ -88,7 +88,7 @@ export default async function download(context) {
 
         // add sort if not present
         if (!queryUrl.searchParams.has('sort')) {
-            queryUrl.searchParams.set('sort', 'id desc');
+            queryUrl.searchParams.set('sort', 'id asc');
         }
 
         if (body.format === 'XML') {
@@ -96,6 +96,7 @@ export default async function download(context) {
             const date = new Date();
             const header = `<?xml version="1.0" encoding="UTF-8"?>\n<iati-activities version="2.03" generated-datetime="${date.toISOString()}">\n`;
             const footer = '</iati-activities>';
+            const newline = '\n';
 
             const uploadStream = new PassThrough();
 
@@ -104,6 +105,8 @@ export default async function download(context) {
             queryUrl.searchParams.set('rows', config.SOLR_MAX_ROWS);
             // only fetch iati_xml field with raw XML
             queryUrl.searchParams.set('fl', 'iati_xml');
+            // unique field required for cursorMark
+            queryUrl.searchParams.set('sort', 'id asc');
 
             const uploadResponsePromise = blockBlobClient.uploadStream(
                 uploadStream,
@@ -122,6 +125,7 @@ export default async function download(context) {
                 const formattedResponse = await query(queryUrl, body.format, false);
                 formattedResponse.response.docs.forEach((doc) => {
                     uploadStream.write(doc.iati_xml);
+                    uploadStream.write(newline);
                 });
 
                 const { nextCursorMark } = formattedResponse;
