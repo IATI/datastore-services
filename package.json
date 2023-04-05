@@ -14,7 +14,7 @@
         "@azure/storage-blob": "^12.13.0",
         "chardet": "^1.5.1",
         "dotenv": "^16.0.3",
-        "durable-functions": "^2.1.1",
+        "durable-functions": "^2.1.2",
         "node-fetch": "^3.2.10",
         "pg": "^8.10.0",
         "uuid": "^9.0.0"
