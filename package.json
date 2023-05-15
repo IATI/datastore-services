@@ -16,7 +16,7 @@
         "dotenv": "^16.0.3",
         "durable-functions": "^2.1.2",
         "node-fetch": "^3.2.10",
-        "pg": "^8.10.0",
+        "pg": "^8.11.0",
         "uuid": "^9.0.0"
     },
     "devDependencies": {
