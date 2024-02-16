@@ -1,0 +1,17 @@
+{
+    "bindings": [
+        {
+            "authLevel": "Function",
+            "type": "HttpTrigger",
+            "direction": "in",
+            "name": "req",
+            "methods": ["post"],
+            "route": "pub/iati-identifiers/exist"
+        },
+        {
+            "type": "http",
+            "direction": "out",
+            "name": "res"
+        }
+    ]
+}
