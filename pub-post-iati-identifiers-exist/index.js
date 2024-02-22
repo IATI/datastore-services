@@ -1,7 +1,7 @@
 import config from '../config/config.js';
 import { query } from '../solr/solr.js';
 
-async function testIatiIdentifiers(queryUrl, identifiers) {
+async function testIatiIdentifiers(queryUrl, identifiers, maxRecords) {
     const iatiIdentifiersQuery = identifiers.map(identifier => 
                                                     `iati_identifier_exact:${JSON.stringify(identifier)}`).join(" ")
 
@@ -13,7 +13,7 @@ async function testIatiIdentifiers(queryUrl, identifiers) {
                     type: "terms",
                     field : "iati_identifier",
                     offset: 0,
-                    limit: 1000
+                    limit: maxRecords
                 }
             }
         };
@@ -26,11 +26,19 @@ async function testIatiIdentifiers(queryUrl, identifiers) {
 
     if ('identifiers' in solrJsonResponse.facets) {
         solrJsonResponse.facets.identifiers.buckets.forEach(facetItem => {
-            result[facetItem.val] = facetItem.count;
+            result[facetItem.val] = {"count": facetItem.count};
         });
     }
 
     return result;
+}
+
+function getJsonErrorResponse(statusCode, errorMessage) {
+    return {
+        status: statusCode,
+        headers: { 'Content-Type': 'application/json' },
+        body: { error: errorMessage },
+    };
 }
 
 export default async function pubIatiIdentifiersExist(context, req) {
@@ -42,66 +50,60 @@ export default async function pubIatiIdentifiersExist(context, req) {
 
         // No body, or body not valid JSON
         if (!body || JSON.stringify(body) === '{}' || typeof(body) === 'string') {
-            context.res = {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-                body: { error: 'No JSON body' },
-            };
-
+            context.res = getJsonErrorResponse(400, 'No JSON body');
             return;
         }
 
         // required keys
         ['iati_identifiers'].forEach((key) => {
             if (!(key in body)) {
-                context.res = {
-                    status: 400,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: { error: `Body must contain key "${key}"` },
-                };
+                context.res = getJsonErrorResponse(400, `Body must contain key "${key}"`);
             }
         });
         if (context.res.status === 400) {
             return;
-        }        
+        }         
 
         // iatiIdentifiers must be an array
         if (toString.call(body.iati_identifiers) !== '[object Array]') {
-            context.res = {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-                body: { 
-                    error: '"iati_identifiers" must be an Array of strings (each one an IATI Identifier) ' 
-                         + `but it is of type: ${toString.call(body.iati_identifiers)}`,
-                },
-            };
+            context.res = getJsonErrorResponse(400, 
+                                               '"iati_identifiers" must be an Array of strings (each one an IATI Identifier) ' 
+                                               + `but it is of type: ${toString.call(body.iati_identifiers)}`);
             return;
         }
 
         const responseBody = {
             "message": "OK",
             "detail": "",
-            "unique_iati_identifiers": 0,
+            "unique_iati_identifiers_found": 0,
             "total_iati_identifier_occurrences": 0,
-            "iati_identifiers_found": {}
+            "num_iati_identifiers_not_found": 0,
+            "iati_identifiers_found": {},
+            "iati_identifiers_not_found": {}
         };
 
         // only make the request to Solr if API consumer has given a non-empty list
         if (body.iati_identifiers.length > 0) {
-            let uniqueIdentifiers = [...new Set(body.iati_identifiers)];
+            const uniqueIdentifiers = [...new Set(body.iati_identifiers)];
             if (uniqueIdentifiers.length > MAX_IDS_TO_TEST) {
-                responseBody.message = "Warning";
-                responseBody.detail = `More than ${MAX_IDS_TO_TEST} IATI Identifiers were passed. Testing the first ${MAX_IDS_TO_TEST}.`;
-                uniqueIdentifiers = uniqueIdentifiers.slice(0, MAX_IDS_TO_TEST);
+                context.res = getJsonErrorResponse(400, 
+                    `More than ${MAX_IDS_TO_TEST} IATI Identifiers were passed.` +
+                    `${MAX_IDS_TO_TEST} is the maximum number that can be tested in a single API call.`);
+                return;
             }
             
             const numBatches = Math.floor(uniqueIdentifiers.length / BATCH_SIZE) + 1;
-            for (let batch = 0; batch <= numBatches; batch += 1) {
+            for (let batchNum = 0; batchNum <= numBatches; batchNum += 1) {
+                const currentBatch = uniqueIdentifiers.slice(batchNum * BATCH_SIZE, batchNum * BATCH_SIZE + BATCH_SIZE);
                 // eslint-disable-next-line no-await-in-loop
-                Object.assign(responseBody.iati_identifiers_found, await testIatiIdentifiers(queryUrl, uniqueIdentifiers.slice(batch * BATCH_SIZE, batch * BATCH_SIZE + BATCH_SIZE)));
+                const identifiersFound = await testIatiIdentifiers(queryUrl, currentBatch, BATCH_SIZE);
+                const identifiersNotFound = Object.fromEntries(currentBatch.filter(x => !(x in identifiersFound)).map(v => [v, {}]));
+                Object.assign(responseBody.iati_identifiers_found, identifiersFound);
+                Object.assign(responseBody.iati_identifiers_not_found, identifiersNotFound);
             }
-            responseBody.unique_iati_identifiers = Object.keys(responseBody.iati_identifiers_found).length;
-            responseBody.total_iati_identifier_occurrences = Object.values(responseBody.iati_identifiers_found).reduce((acc, val) => acc + val, 0);
+            responseBody.unique_iati_identifiers_found = Object.keys(responseBody.iati_identifiers_found).length;
+            responseBody.total_iati_identifier_occurrences = Object.values(responseBody.iati_identifiers_found).reduce((acc, val) => acc + val.count, 0);
+            responseBody.num_iati_identifiers_not_found = Object.keys(responseBody.iati_identifiers_not_found).length;
         }
 
         context.res = {

@@ -348,14 +348,20 @@ paths:
                                         type: string  
                                     detail:
                                         type: string  
-                                    unique_iati_identifiers:
-                                        description: The number of unique identifiers found in the Datastore from the identifier list passed.
+                                    unique_iati_identifiers_found:
+                                        description: The number of unique identifiers passed in the list that were found in the Datastore.
                                         type: integer
                                     total_iati_identifier_occurrences:
                                         description: The number of activities found in the Datastore matching one of the identifier list passed.
                                         type: integer
+                                    num_iati_identifiers_not_found:
+                                        description: The number of activities passed in the list that were not found in the Datastore.
+                                        type: integer                                        
                                     iati_identifiers_found:
-                                        description: Dictionary with IATI Identifiers as keys, and their count in Datastore as values.
+                                        description: Dictionary of dictionaries of activities found. Key is IATI identifier. Each sub-dictionary contains a 'count' key the value of which is the count of the item in the datastore.
+                                        type: object
+                                    iati_identifiers_not_found:
+                                        description: Dictionary of dictionaries of activities not found. Key is IATI identifier. The sub-dictionaries will be empty at the moment, but may contain further information in future releases.
                                         type: object
                 400:
                     description: Expected errors
