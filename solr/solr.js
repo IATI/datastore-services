@@ -38,7 +38,8 @@ const createOrUpdateAlias = async (aliasName, collectionName) => {
     checkRespStatus(response);
 };
 
-const query = async (url, format = 'JSON', docsOnly = false, stream = false) => {
+const query = async (url, format = 'JSON', docsOnly = false, stream = false, 
+                     contentType = '', requestBody = '') => {
     switch (format) {
         case 'CSV':
             url.searchParams.set('wt', 'csv');
@@ -56,14 +57,21 @@ const query = async (url, format = 'JSON', docsOnly = false, stream = false) => 
         default:
             break;
     }
-    const response = await fetch(url, {
+
+    const req = {
+        method : requestBody === '' ? "GET" : "POST",
         headers: {
             Authorization: `Basic ${Buffer.from(
                 `${config.SOLRCONFIG.user}:${config.SOLRCONFIG.password}`,
                 'binary'
-            ).toString('base64')}`,
+            ).toString('base64')}`
         },
-    });
+        body : requestBody
+    };
+    if (contentType !== "") {
+        req.headers["Content-Type"] = contentType;
+    }
+    const response = await fetch(url, req);
     checkRespStatus(response);
 
     if (stream) {
