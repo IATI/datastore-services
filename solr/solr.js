@@ -59,15 +59,18 @@ const query = async (url, format = 'JSON', docsOnly = false, stream = false,
     }
 
     const req = {
-        method : requestBody === '' ? "GET" : "POST",
         headers: {
             Authorization: `Basic ${Buffer.from(
                 `${config.SOLRCONFIG.user}:${config.SOLRCONFIG.password}`,
                 'binary'
             ).toString('base64')}`
-        },
-        body : requestBody
+        }
     };
+    if (requestBody !== '') {
+        req.method = 'POST';
+        req.body = requestBody;
+    }
+
     if (contentType !== "") {
         req.headers["Content-Type"] = contentType;
     }

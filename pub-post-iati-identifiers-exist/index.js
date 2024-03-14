@@ -44,7 +44,7 @@ function getJsonErrorResponse(statusCode, errorMessage) {
 export default async function pubIatiIdentifiersExist(context, req) {
     try {
         const { body } = req;
-        const queryUrl = new URL(`${config.SOLRCONFIG.url}solr/activity/select`);
+        const queryUrl = new URL(`${config.SOLRCONFIG.url}activity/select`);
         const BATCH_SIZE = config.SOLR_MAX_ROWS;
         const MAX_IDS_TO_TEST = config.IATI_IDENTIFIERS_EXIST_MAX_NUMBER_OF_IDS;
 
@@ -87,7 +87,7 @@ export default async function pubIatiIdentifiersExist(context, req) {
             const uniqueIdentifiers = [...new Set(body.iati_identifiers)];
             if (uniqueIdentifiers.length > MAX_IDS_TO_TEST) {
                 context.res = getJsonErrorResponse(400, 
-                    `More than ${MAX_IDS_TO_TEST} IATI Identifiers were passed.` +
+                    `More than ${MAX_IDS_TO_TEST} IATI Identifiers were passed. ` +
                     `${MAX_IDS_TO_TEST} is the maximum number that can be tested in a single API call.`);
                 return;
             }
