@@ -125,6 +125,11 @@ jobs:
                     "name": "AzureWebJobsSecretStorageKeyVaultUri",
                     "value": "${{ env.KV_URI }}",
                     "slotSetting": false
+                },
+                {
+                    "name": "IATI_IDENTIFIERS_EXIST_MAX_NUMBER_OF_IDS",
+                    "value": "${{ env.IATI_IDENTIFIERS_EXIST_MAX_NUMBER_OF_IDS }}",
+                    "slotSetting": false
                 }
             ]
 
