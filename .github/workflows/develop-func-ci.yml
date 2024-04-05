@@ -12,6 +12,7 @@ jobs:
   build:
     uses: IATI/.github/.github/workflows/build_node_save.yaml@main
     with:
+      npm_version: ^10
       save_artifact: false
 
   automerge:

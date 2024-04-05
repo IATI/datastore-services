@@ -28,6 +28,7 @@ jobs:
   build_save:
     uses: IATI/.github/.github/workflows/build_node_save.yaml@main
     with:
+      npm_version: ^10
       save_artifact: true
       artifact_name: build-artifact-prod
 
@@ -146,7 +147,7 @@ jobs:
         run: sleep 180
 
       - name: 'Checkout GitHub Action'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 'Install newman'
         run: |
