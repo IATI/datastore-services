@@ -1,3 +1,14 @@
+# Summary
+
+| Product          | Datastore Services API                                                                                                                                    |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Description      | Node.JS app that provides various admin API end points for management of the Datastore, and an API end point to check for the existence of IATI Identifiers in the Datastore |
+| Website          | [https://datastore.iatistandard.org](https://datastore.iatistandard.org) |
+| Related          | [IATI/datastore-search](https://github.com/IATI/datastore-search)                     |
+| Documentation    | [https://developer.iatistandard.org/](https://developer.iatistandard.org/)                                                                         |
+| Technical Issues | https://github.com/IATI/datastore-services/issues                                                                                                          |
+| Support          | https://iatistandard.org/en/guidance/get-support/      
+
 # datastore-services
 
 ## Endpoints
