@@ -47,7 +47,7 @@ jobs:
           rm build-artifact-prod.zip
 
       - name: 'Login via Azure CLI'
-        uses: azure/login@v2.0.0
+        uses: azure/login@v2.1.0
         with:
           creds: ${{ env.AZURE_CREDENTIALS }} # Service Principal credentials saved in GitHub Secrets
 
