@@ -30,6 +30,7 @@ env:
   DOWNLOAD_CONTAINER_NAME: ${{ secrets.DEV_DOWNLOAD_CONTAINER_NAME }}
   KV_URI: ${{ secrets.DEV_KV_URI }}
   API_KEY: ${{ secrets.DEV_VALIDATOR_SERVICES_KEY_VALUE }}
+  IATI_IDENTIFIERS_EXIST_MAX_NUMBER_OF_IDS: ${{ vars.DEV_IATI_IDENTIFIERS_EXIST_MAX_NUMBER_OF_IDS }}
 
 jobs:
   should_run:
@@ -40,6 +41,7 @@ jobs:
     if: ${{ needs.should_run.outputs.should_run == 'true' }}
     uses: IATI/.github/.github/workflows/build_node_save.yaml@main
     with:
+      npm_version: ^10
       save_artifact: true
       artifact_name: build-artifact-dev
 
@@ -48,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-artifact-dev
 
@@ -58,7 +60,7 @@ jobs:
           rm build-artifact-dev.zip
 
       - name: 'Login via Azure CLI'
-        uses: azure/login@v1.4.6
+        uses: azure/login@v2.1.1
         with:
           creds: ${{ env.AZURE_CREDENTIALS }} # Service Principal credentials saved in GitHub Secrets
 
@@ -137,11 +139,16 @@ jobs:
                     "name": "AzureWebJobsSecretStorageKeyVaultUri",
                     "value": "${{ env.KV_URI }}",
                     "slotSetting": false
+                },
+                {
+                    "name": "IATI_IDENTIFIERS_EXIST_MAX_NUMBER_OF_IDS",
+                    "value": "${{ env.IATI_IDENTIFIERS_EXIST_MAX_NUMBER_OF_IDS }}",
+                    "slotSetting": false
                 }
             ]
 
       - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1.4.8
+        uses: Azure/functions-action@v1.5.2
         with:
           app-name: ${{ env.NAME }}-${{ env.STAGE }}
 
@@ -153,7 +160,7 @@ jobs:
         run: sleep 180
 
       - name: 'Checkout GitHub Action'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 'Install newman'
         run: |

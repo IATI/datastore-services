@@ -12,6 +12,7 @@ jobs:
   build:
     uses: IATI/.github/.github/workflows/build_node_save.yaml@main
     with:
+      npm_version: ^10
       save_artifact: false
 
   automerge:
@@ -21,6 +22,6 @@ jobs:
       pull-requests: write
       contents: write
     steps:
-      - uses: fastify/github-action-merge-dependabot@v3.5.4
+      - uses: fastify/github-action-merge-dependabot@v3.10.1
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}

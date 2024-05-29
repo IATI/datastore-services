@@ -1,3 +1,14 @@
+# Summary
+
+| Product          | Datastore Services API                                                                                                                                    |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Description      | Node.JS app that provides various admin API end points for management of the Datastore, and an API end point to check for the existence of IATI Identifiers in the Datastore |
+| Website          | [https://datastore.iatistandard.org](https://datastore.iatistandard.org) |
+| Related          | [IATI/datastore-search](https://github.com/IATI/datastore-search)                     |
+| Documentation    | [https://developer.iatistandard.org/](https://developer.iatistandard.org/)                                                                         |
+| Technical Issues | https://github.com/IATI/datastore-services/issues                                                                                                          |
+| Support          | https://iatistandard.org/en/guidance/get-support/      
+
 # datastore-services
 
 ## Endpoints
@@ -165,16 +176,35 @@ Example
 
 ## Integration Tests
 
-### Running
+### Running against a local environment:
 
 -   Install newman globally `npm i -g newman`
--   Start function `npm start`
+-   Start function `npm start` (or using whatever method you use, if you want debugging)
 -   Run Tests `npm run int:test`
+
+### Running against dev or production
+
+You can run the tests locally using Newman, but against the dev or production Azure
+servers. This is useful because it can be faster than running via Postman, and it
+doesn't count towards any Postman quotas.
+
+#### Against dev
+
+Replace `KEY` with the Azure key for the dev Function app (available in the Postman web interface):
+
+`npm run int:test:dev -- --env-var "keyValue=KEY"`
+
+#### Against production
+
+Replace `KEY` with the Azure key for the prod Function app (available in the Postman web interface):
+
+`npm run int:test:prod -- --env-var "keyValue=KEY"`
+
+
 
 ### Modifying/Adding
 
-Integration tests are written in Postman v2.1 format and run with newman
-Import the `integrations-tests/azure-function-node-microservice-template.postman_collection.json` into Postman and write additional tests there
+Integration tests are written in Postman v2.1 format and run with Newman. The easiest way is to write new tests in Postman (using the website or the desktop client), and then export the collection using the default filename, saving the result into this repo, in `integration-tests/`.
 
 ## Deployment
 
