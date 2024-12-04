@@ -4,6 +4,8 @@ name: Deploy_To_PROD_Function_On_Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
+
 
 env:
   STAGE: prod # suffix to indicate environment stage
