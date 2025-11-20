@@ -149,7 +149,7 @@ jobs:
         run: sleep 180
 
       - name: 'Checkout GitHub Action'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: 'Install newman'
         run: |
