@@ -4,14 +4,14 @@ on:
   workflow_dispatch:
   push:
     paths-ignore: # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
-      - '**/README.md' # don't run on README.md file updates anywhere in repo
-      - '**/dependabot.yml'
-      - '.github/workflows/prod-func-deploy.yml'
-      - './pvt-post-solr-create-collections/exampleRequest.json'
+      - "**/README.md" # don't run on README.md file updates anywhere in repo
+      - "**/dependabot.yml"
+      - ".github/workflows/prod-func-deploy.yml"
+      - "./pvt-post-solr-create-collections/exampleRequest.json"
     branches:
       - develop
   schedule:
-    - cron: '17 04 * * *' # 0417am daily
+    - cron: "17 04 * * *" # 0417am daily
 
 env:
   STAGE: dev # suffix to indicate environment stage
@@ -41,7 +41,7 @@ jobs:
     if: ${{ needs.should_run.outputs.should_run == 'true' }}
     uses: IATI/.github/.github/workflows/build_node_save.yaml@main
     with:
-      npm_version: ^10
+      npm_version: ^11
       save_artifact: true
       artifact_name: build-artifact-dev
 
@@ -59,7 +59,7 @@ jobs:
           unzip build-artifact-dev.zip
           rm build-artifact-dev.zip
 
-      - name: 'Login via Azure CLI'
+      - name: "Login via Azure CLI"
         uses: azure/login@v3.0.0
         with:
           creds: ${{ env.AZURE_CREDENTIALS }} # Service Principal credentials saved in GitHub Secrets
@@ -147,7 +147,7 @@ jobs:
                 }
             ]
 
-      - name: 'Run Azure Functions Action'
+      - name: "Run Azure Functions Action"
         uses: Azure/functions-action@v1.5.6
         with:
           app-name: ${{ env.NAME }}-${{ env.STAGE }}
@@ -156,17 +156,17 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-      - name: 'Wait for 3 minutes'
+      - name: "Wait for 3 minutes"
         run: sleep 180
 
-      - name: 'Checkout GitHub Action'
+      - name: "Checkout GitHub Action"
         uses: actions/checkout@v6
 
-      - name: 'Install newman'
+      - name: "Install newman"
         run: |
           sudo npm i -g newman
 
-      - name: 'Run integration tests'
+      - name: "Run integration tests"
         run: |
           newman run integration-tests/datastore-services-integration-tests.postman_collection.json \
             -e integration-tests/envs/func-datastore-services-dev.postman_environment.json \
