@@ -42,7 +42,6 @@ const findEncoding = (chunk) => {
     return encodingMapping;
 };
 
-/* eslint no-underscore-dangle: ["error", { "allow": ["_transform"] }] */
 class ExcelSafeStreamTransform extends Transform {
     constructor() {
         super();
@@ -132,7 +131,6 @@ class ExcelSafeStreamTransform extends Transform {
         callback();
     }
 }
-/* eslint no-underscore-dangle: 0 */
 
 function excelSafeStringTransform(chunkStr, truncLength = 32700) {
     const sep = ',';
