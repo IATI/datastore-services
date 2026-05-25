@@ -9,7 +9,7 @@
         "int:test": "newman run integration-tests/datastore-services-integration-tests.postman_collection.json -e integration-tests/envs/local-function-7071.postman_environment.json",
         "int:test:dev": "newman run integration-tests/datastore-services-integration-tests.postman_collection.json -e integration-tests/envs/func-datastore-services-dev.postman_environment.json",
         "int:test:prod": "newman run integration-tests/datastore-services-integration-tests.postman_collection.json -e integration-tests/envs/func-datastore-services-prod.postman_environment.json",
-        "prepare": "husky install"
+        "prepare": "husky"
     },
     "author": "IATI",
     "dependencies": {
@@ -27,7 +27,7 @@
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-import": "^2.29.1",
-        "husky": "^8.0.3",
+        "husky": "^9.0.0",
         "lint-staged": "^17.0.0",
         "prettier": "^3.2.5"
     },
