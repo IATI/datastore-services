@@ -4,6 +4,8 @@ name: Deploy_To_PROD_Function_On_Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
+
 
 env:
   STAGE: prod # suffix to indicate environment stage
@@ -28,6 +30,7 @@ jobs:
   build_save:
     uses: IATI/.github/.github/workflows/build_node_save.yaml@main
     with:
+      npm_version: ^10
       save_artifact: true
       artifact_name: build-artifact-prod
 
@@ -36,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-artifact-prod
 
@@ -46,7 +49,7 @@ jobs:
           rm build-artifact-prod.zip
 
       - name: 'Login via Azure CLI'
-        uses: azure/login@v2.0.0
+        uses: azure/login@v3.0.0
         with:
           creds: ${{ env.AZURE_CREDENTIALS }} # Service Principal credentials saved in GitHub Secrets
 
@@ -134,7 +137,7 @@ jobs:
             ]
 
       - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1.5.1
+        uses: Azure/functions-action@v1.5.6
         with:
           app-name: ${{ env.NAME }}-${{ env.STAGE }}
 
@@ -146,7 +149,7 @@ jobs:
         run: sleep 180
 
       - name: 'Checkout GitHub Action'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: 'Install newman'
         run: |

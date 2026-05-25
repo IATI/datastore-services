@@ -1,6 +1,6 @@
 {
     "name": "datastore-services",
-    "version": "1.6.5",
+    "version": "1.6.7",
     "description": "Datastore utility endpoints",
     "type": "module",
     "scripts": {
@@ -36,7 +36,7 @@
         "*.{js,css,md}": "prettier --write"
     },
     "engines": {
-        "node": ">=16 <17",
-        "npm": ">=8"
+        "node": "20.x.x",
+        "npm": "10.x.x"
     }
 }
