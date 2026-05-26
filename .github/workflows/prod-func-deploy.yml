@@ -60,7 +60,7 @@ jobs:
             [
                 {
                     "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                    "value": "~16",
+                    "value": "~24",
                     "slotSetting": false
                 },
                 {
