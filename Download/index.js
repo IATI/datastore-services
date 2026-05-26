@@ -55,12 +55,12 @@ export default async function download(context) {
 
         // upload to blob
         const blobServiceClient = BlobServiceClient.fromConnectionString(
-            config.STORAGE_CONNECTION_STRING
+            config.STORAGE_CONNECTION_STRING,
         );
         // set service version so Content-Disposition is returned by Blob API when retrieving
         await blobServiceClient.setProperties({ defaultServiceVersion: '2020-12-06' });
         const containerClient = blobServiceClient.getContainerClient(
-            config.DOWNLOAD_CONTAINER_NAME
+            config.DOWNLOAD_CONTAINER_NAME,
         );
         let blobName;
         if (body.format === 'EXCEL') {
@@ -112,7 +112,7 @@ export default async function download(context) {
                 uploadStream,
                 uploadOptions.bufferSize,
                 uploadOptions.maxBuffers,
-                uploadConfig
+                uploadConfig,
             );
 
             // paginate over results using cursorMark
@@ -121,7 +121,6 @@ export default async function download(context) {
             do {
                 queryUrl.searchParams.set('cursorMark', currentCursorMark);
 
-                // eslint-disable-next-line no-await-in-loop
                 const formattedResponse = await query(queryUrl, body.format, false);
                 formattedResponse.response.docs.forEach((doc) => {
                     uploadStream.write(doc.iati_xml);
@@ -150,7 +149,7 @@ export default async function download(context) {
                 fullResponse,
                 uploadOptions.bufferSize,
                 uploadOptions.maxBuffers,
-                uploadConfig
+                uploadConfig,
             );
         }
 

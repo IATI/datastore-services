@@ -2,7 +2,6 @@ import { Readable } from 'stream';
 
 const BOM = '\ufeff';
 
-/* eslint no-underscore-dangle: ["error", { "allow": ["_read"] }] */
 class ConcatStream extends Readable {
     constructor() {
         super();
@@ -48,7 +47,6 @@ class ConcatStream extends Readable {
         this.onEnd();
     }
 }
-/* eslint no-underscore-dangle: 0 */
 
 const prependBOM = (stream) => {
     const concat = new ConcatStream();

@@ -3,8 +3,8 @@
 		"_postman_id": "ccce44b4-f339-4cba-ae35-ee1ef20e5df5",
 		"name": "datastore-services-integration-tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "29844336",
-		"_collection_link": "https://iatisecretariat.postman.co/workspace/IATI~c354ba4e-15bf-41ee-9d69-a5a5360da160/collection/13097277-ccce44b4-f339-4cba-ae35-ee1ef20e5df5?action=share&source=collection_link&creator=29844336"
+		"_exporter_id": "28259772",
+		"_collection_link": "https://iatisecretariat.postman.co/workspace/IATI~c354ba4e-15bf-41ee-9d69-a5a5360da160/collection/13097277-ccce44b4-f339-4cba-ae35-ee1ef20e5df5?action=share&source=collection_link&creator=28259772"
 	},
 	"item": [
 		{
@@ -236,7 +236,8 @@
 													"    });",
 													"});"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
@@ -245,7 +246,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"GB-COH-06368740-P0055\\\"\",\n    \"format\": \"JSON\"\n}",
+											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"NL-KVK-27108436-A-04758-02:GR\\\"\",\n    \"format\": \"JSON\"\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -290,11 +291,12 @@
 													"    const file = response.text();",
 													"    pm.test(\"CSV File contains expected headers and row of data\", function () {",
 													"        pm.expect(file).to.contain(\"iati_identifier,reporting_org_ref,reporting_org_type\")",
-													"        pm.expect(file).to.contain(\"GB-COH-06368740-P0055,GB-COH-06368740,21\")",
+													"        pm.expect(file).to.contain(\"NL-KVK-27108436-A-04758-02:GR,NL-KVK-27108436,21\")",
 													"    })",
 													"});"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
@@ -303,7 +305,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"GB-COH-06368740-P0055\\\"&fl=iati_identifier,reporting_org_ref,reporting_org_type\",\n    \"format\": \"CSV\"\n}",
+											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"NL-KVK-27108436-A-04758-02:GR\\\"&fl=iati_identifier,reporting_org_ref,reporting_org_type\",\n    \"format\": \"CSV\"\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -348,11 +350,12 @@
 													"    const file = response.text();",
 													"    pm.test(\"CSV File contains expected headers and row of data\", function () {",
 													"        pm.expect(file).to.contain(\"iati_identifier,reporting_org_ref,reporting_org_type\")",
-													"        pm.expect(file).to.contain(\"GB-COH-06368740-P0055,GB-COH-06368740,21\")",
+													"        pm.expect(file).to.contain(\"NL-KVK-27108436-A-04758-02:GR,NL-KVK-27108436,21\")",
 													"    })",
 													"});"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
@@ -361,7 +364,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"GB-COH-06368740-P0055\\\"&fl=iati_identifier,reporting_org_ref,reporting_org_type\",\n    \"format\": \"EXCEL\"\n}",
+											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"NL-KVK-27108436-A-04758-02:GR\\\"&fl=iati_identifier,reporting_org_ref,reporting_org_type\",\n    \"format\": \"EXCEL\"\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -413,12 +416,13 @@
 													"    })",
 													"    pm.test(\"XML File contains expected iati-identifier\", function () {",
 													"        console.log(jsonObject['iati-activities']['iati-activity']['iati-identifier'])",
-													"        pm.expect(jsonObject['iati-activities']['iati-activity']['iati-identifier']).to.eql('GB-COH-06368740-P0055')",
+													"        pm.expect(jsonObject['iati-activities']['iati-activity']['iati-identifier']).to.eql('NL-KVK-27108436-A-04758-02:GR')",
 													"    }) ",
 													"});",
 													""
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
@@ -427,7 +431,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"GB-COH-06368740-P0055\\\"&fl=iati_identifier,reporting_org_ref,reporting_org_type\",\n    \"format\": \"XML\"\n}",
+											"raw": "{\n    \"query\": \"activity/search?q=iati_identifier:\\\"NL-KVK-27108436-A-04758-02:GR\\\"&fl=iati_identifier,reporting_org_ref,reporting_org_type\",\n    \"format\": \"XML\"\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -626,7 +630,8 @@
 											"});",
 											""
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],

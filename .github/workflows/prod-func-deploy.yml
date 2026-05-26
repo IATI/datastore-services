@@ -6,7 +6,6 @@ on:
     types: [published]
   workflow_dispatch:
 
-
 env:
   STAGE: prod # suffix to indicate environment stage
   NAME: func-datastore-services
@@ -30,7 +29,7 @@ jobs:
   build_save:
     uses: IATI/.github/.github/workflows/build_node_save.yaml@main
     with:
-      npm_version: ^10
+      npm_version: ^11
       save_artifact: true
       artifact_name: build-artifact-prod
 
@@ -39,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-artifact-prod
 
@@ -48,8 +47,8 @@ jobs:
           unzip build-artifact-prod.zip
           rm build-artifact-prod.zip
 
-      - name: 'Login via Azure CLI'
-        uses: azure/login@v2.2.0
+      - name: "Login via Azure CLI"
+        uses: azure/login@v3.0.0
         with:
           creds: ${{ env.AZURE_CREDENTIALS }} # Service Principal credentials saved in GitHub Secrets
 
@@ -61,7 +60,7 @@ jobs:
             [
                 {
                     "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                    "value": "~16",
+                    "value": "~24",
                     "slotSetting": false
                 },
                 {
@@ -136,8 +135,8 @@ jobs:
                 }
             ]
 
-      - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1.5.2
+      - name: "Run Azure Functions Action"
+        uses: Azure/functions-action@v1.5.6
         with:
           app-name: ${{ env.NAME }}-${{ env.STAGE }}
 
@@ -145,17 +144,17 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-      - name: 'Wait for 3 minutes'
+      - name: "Wait for 3 minutes"
         run: sleep 180
 
-      - name: 'Checkout GitHub Action'
-        uses: actions/checkout@v4
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@v6
 
-      - name: 'Install newman'
+      - name: "Install newman"
         run: |
           sudo npm i -g newman
 
-      - name: 'Run integration tests'
+      - name: "Run integration tests"
         run: |
           newman run integration-tests/datastore-services-integration-tests.postman_collection.json \
             -e integration-tests/envs/func-datastore-services-prod.postman_environment.json \
