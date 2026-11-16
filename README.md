@@ -1,13 +1,13 @@
 # Summary
 
-| Product          | Datastore Services API                                                                                                                                    |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Product          | Datastore Services API                                                                                                                                                       |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Description      | Node.JS app that provides various admin API end points for management of the Datastore, and an API end point to check for the existence of IATI Identifiers in the Datastore |
-| Website          | [https://datastore.iatistandard.org](https://datastore.iatistandard.org) |
-| Related          | [IATI/datastore-search](https://github.com/IATI/datastore-search)                     |
-| Documentation    | [https://developer.iatistandard.org/](https://developer.iatistandard.org/)                                                                         |
-| Technical Issues | https://github.com/IATI/datastore-services/issues                                                                                                          |
-| Support          | https://iatistandard.org/en/guidance/get-support/      
+| Website          | [https://datastore.iatistandard.org](https://datastore.iatistandard.org)                                                                                                     |
+| Related          | [IATI/datastore-search](https://github.com/IATI/datastore-search)                                                                                                            |
+| Documentation    | [https://developer.iatistandard.org/](https://developer.iatistandard.org/)                                                                                                   |
+| Technical Issues | https://github.com/IATI/datastore-services/issues                                                                                                                            |
+| Support          | https://iatistandard.org/en/guidance/get-support/                                                                                                                            |
 
 # datastore-services
 
@@ -17,21 +17,22 @@ See OpenAPI specification `postman/schemas/index.yaml`. To view locally in Swagg
 
 ## Prerequisities
 
--   nvm - [nvm](https://github.com/nvm-sh/nvm) - Node version manager
--   Node LTS
-    -   This will be the latest LTS version supported by Azure Functions, set in `.nvmrc`
-    -   once you've installed nvm run `nvm use` which will look at `.nvmrc` for the node version, if it's not installed then it will prompt you to install it with `nvm install <version> --latest-npm`
--   npm >=8
-    -   nvm will install the version of npm packaged with node. make sure to use the `--latest-npm` flag to get the latest version
-    -   If you forgot to do that install the latest version of npm with `npm i -g npm`
--   [Azure Functions Core Tools v3](https://github.com/Azure/azure-functions-core-tools)
--   [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.4 or later.
+- nvm - [nvm](https://github.com/nvm-sh/nvm) - Node version manager
+- Node LTS
+    - This will be the latest LTS version supported by Azure Functions, set in `.nvmrc`
+    - once you've installed nvm run `nvm use` which will look at `.nvmrc` for the node version, if it's not installed then it will prompt you to install it with `nvm install <version> --latest-npm`
+- npm >=8
+    - nvm will install the version of npm packaged with node. make sure to use the `--latest-npm` flag to get the latest version
+    - If you forgot to do that install the latest version of npm with `npm i -g npm`
+- [Azure Functions Core Tools v3](https://github.com/Azure/azure-functions-core-tools)
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.4 or later.
 
 ## Getting Started
 
 1. Clone repo
 1. Follow instructions for nvm/node prerequisties above
 1. Prepare your environment variables as described below
+1. Start the docker compose setup in `local-dev/` which just runs an Azurite blob container needed for Azure Functions
 1. Run `npm i`
 1. Run `npm start` to run the function locally using the Azure Functions Core Tools
 
@@ -59,7 +60,7 @@ Needs a `local.settings.json` with an [Azure Storage account](https://github.com
 
 `APPINSIGHTS_INSTRUMENTATIONKEY`
 
--   Needs to be set for running locally, but will not actually report telemetry to the AppInsights instance in my experience
+- Needs to be set for running locally, but will not actually report telemetry to the AppInsights instance in my experience
 
 Others:
 
@@ -74,6 +75,8 @@ PGUSER=<username>@<host>
 SOLR_URL=
 SOLR_USERNAME=
 SOLR_PASSWORD=
+
+IATI_IDENTIFIERS_EXIST_MAX_NUMBER_OF_IDS=5000
 ```
 
 The DOWNLOAD_CONTAINER_NAME must be a container with Public Access for Blobs to allow unauthenticated download from the browser.
@@ -101,22 +104,22 @@ let myEnvVariable = config.ENV_VAR
 
 ## Attached Debugging (VSCode)
 
--   Set a breakpoint
--   Press F5 to start the Azure Function and Attach the VSCode debugger
-    -   Configuration is contained in `.vscode/launch.json` and `.vscode/tasks.json`
--   Trigger a request that will hit your break point
--   Enojy!
+- Set a breakpoint
+- Press F5 to start the Azure Function and Attach the VSCode debugger
+    - Configuration is contained in `.vscode/launch.json` and `.vscode/tasks.json`
+- Trigger a request that will hit your break point
+- Enojy!
 
 ## Linting and Code Formatting
 
 ### Prerequisities
 
--   To show linting inline install [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for VSCode
+- To show linting inline install [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for VSCode
 
 ### Info
 
--   This is done with eslint following the airbnb-base style and using [Prettier](https://prettier.io). Implemented with [this](https://sourcelevel.io/blog/how-to-setup-eslint-and-prettier-on-node) guide.
--   If you use VSCode the formatting will happen automagically on save due to the `.vscode/settings.json` > `"editor.formatOnSave": true` setting
+- This is done with eslint following the airbnb-base style and using [Prettier](https://prettier.io). Implemented with [this](https://sourcelevel.io/blog/how-to-setup-eslint-and-prettier-on-node) guide.
+- If you use VSCode the formatting will happen automagically on save due to the `.vscode/settings.json` > `"editor.formatOnSave": true` setting
 
 ## Endpoints notes
 
@@ -126,10 +129,17 @@ https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-function
 
 Downloads the provided Solr query to Azure Blobs and returns URL where it can be downloaded from.
 
--   Request
+- Request
 
--   query - solr query
--   format - JSON, CSV, or XML
+- query - solr query: a read-only path of the form `<collection>/select` (or
+  `<collection>/search`), optionally followed by `?` and Solr parameters
+- format - JSON, CSV, or XML
+
+The `query` is validated before it is relayed: it must target a `select`/`search`
+handler, so Solr admin handlers (`admin/collections?action=...`) are rejected by
+this endpoint even though the service's Solr credential is able to run them. A
+leading slash is tolerated; a `#` fragment is not. Maximum length is 8000
+characters.
 
 Example:
 
@@ -140,7 +150,7 @@ Example:
 }
 ```
 
--   Returns
+- Returns
 
 200 Response
 
@@ -166,9 +176,9 @@ Example
 
 ### Download Formats request strategy
 
--   XML - Have to paginate with SOLR_MAX_ROWS as max rows requested in one call as requesting all rows in one call caused Solr to return 5xx errors
-    -   This is likely due to using either Velocity or XSLT response writer to generate the raw XML
--   JSON, CSV, EXCEL - Requests all rows in one call and streams directly to the Blob storage. Solr seems to be able to handle requesting all rows well for these so we can just stream the response directly for all rows.
+- XML - Have to paginate with SOLR_MAX_ROWS as max rows requested in one call as requesting all rows in one call caused Solr to return 5xx errors
+    - This is likely due to using either Velocity or XSLT response writer to generate the raw XML
+- JSON, CSV, EXCEL - Requests all rows in one call and streams directly to the Blob storage. Solr seems to be able to handle requesting all rows well for these so we can just stream the response directly for all rows.
 
 ## Creating a new route
 
@@ -178,9 +188,9 @@ Example
 
 ### Running against a local environment:
 
--   Install newman globally `npm i -g newman`
--   Start function `npm start` (or using whatever method you use, if you want debugging)
--   Run Tests `npm run int:test`
+- Install newman globally `npm i -g newman`
+- Start function `npm start` (or using whatever method you use, if you want debugging)
+- Run Tests `npm run int:test`
 
 ### Running against dev or production
 
@@ -199,8 +209,6 @@ Replace `KEY` with the Azure key for the dev Function app (available in the Post
 Replace `KEY` with the Azure key for the prod Function app (available in the Postman web interface):
 
 `npm run int:test:prod -- --env-var "keyValue=KEY"`
-
-
 
 ### Modifying/Adding
 
