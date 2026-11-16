@@ -38,7 +38,7 @@ const parseReadOnlySolrQuery = (raw) => {
 
     if (path.startsWith('admin/')) {
         throw new SolrQueryError(
-            `"query" must target a read-only select handler, but "${path}" is an admin handler`,
+            `"query" must target a read-only select/search handler, but "${path}" is an admin handler`,
         );
     }
     if (!READ_ONLY_PATH.test(path)) {
@@ -47,7 +47,12 @@ const parseReadOnlySolrQuery = (raw) => {
         );
     }
 
-    return { path, params: new URLSearchParams(rest[0] ?? '') };
+    const params = new URLSearchParams(rest[0] ?? '');
+    // `qt` can reroute the request to another (possibly writable) handler, so exclude that
+    if (params.has('qt')) {
+        throw new SolrQueryError('"query" must not include a "qt" parameter');
+    }
+    return { path, params };
 };
 
 export { parseReadOnlySolrQuery, SolrQueryError };

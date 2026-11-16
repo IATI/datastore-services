@@ -54,6 +54,9 @@ export default async function download(context) {
         try {
             solrQuery = parseReadOnlySolrQuery(body.query);
         } catch (error) {
+            if (error?.constructor?.name !== 'SolrQueryError') {
+                throw error;
+            }
             return {
                 status: 400,
                 error: error.message,

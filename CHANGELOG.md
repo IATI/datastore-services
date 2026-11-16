@@ -12,7 +12,7 @@ The subheadings `CHANGELOG`s can use are: Added, Changed, Deprecated, Fixed, Rem
 
 ### Fixed
 
-- Ensure that the caller-supplied query is a read-only select handler before it is relayed to Solr.
+- Ensure that the caller-supplied query is a read-only select/search handler before it is relayed to Solr.
 
 ### Added
 

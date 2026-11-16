@@ -187,7 +187,6 @@ Example
 
 ### Running against a local environment:
 
-- Install newman globally `npm i -g newman`
 - Start function `npm start` (or using whatever method you use, if you want debugging)
 - Run Tests `npm run int:test`
 
