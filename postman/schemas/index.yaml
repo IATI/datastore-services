@@ -292,8 +292,18 @@ paths:
                             type: object
                             properties:
                                 query:
-                                    description: The Solr query to request for download
+                                    description: >-
+                                        The Solr query to request for download. Must
+                                        target a read-only handler in the form
+                                        `<collection>/select` or `<collection>/search`,
+                                        optionally followed by `?` and Solr parameters.
+                                        Admin handlers (for example
+                                        `admin/collections?action=DELETE`) are rejected
+                                        because the service relays them with its
+                                        privileged Solr credential.
                                     type: string
+                                    maxLength: 8000
+                                    example: 'activity/select?q=reporting_org_ref:"GB-CHC"&fl=iati_identifier,iati_xml'
                                 format:
                                     description: The format to save the download in
                                     type: string
@@ -310,6 +320,14 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrchestratorResponse'
+                400:
+                    description: >-
+                        Missing body, missing `query`/`format`, unsupported format,
+                        or a `query` that is not a read-only select path
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
                 401:
                     $ref: '#/components/responses/UnauthorizedError'
                 500:
