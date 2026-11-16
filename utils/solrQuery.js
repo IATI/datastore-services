@@ -1,9 +1,8 @@
-// This ensures that the caller-supplied query is a read-only select handler
-// before it is relayed. Parsing (rather than pasting) it into the URL also
-// means every parameter is encoded correctly.
+// This ensures that the caller-supplied query is a read-only handler before it
+// is relayed. Parsing (rather than pasting) it into the URL also means every
+// parameter is encoded correctly.
 //
-// Accepted forms:
-//   "<collection>/select[?<params>]" or
+// Accepted forms: "<collection>/select[?<params>]" or
 //   "<collection>/search[?<params>]"
 
 const MAX_QUERY_LENGTH = 8000;

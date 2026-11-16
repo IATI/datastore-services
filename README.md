@@ -108,7 +108,6 @@ let myEnvVariable = config.ENV_VAR
 - Press F5 to start the Azure Function and Attach the VSCode debugger
     - Configuration is contained in `.vscode/launch.json` and `.vscode/tasks.json`
 - Trigger a request that will hit your break point
-- Enojy!
 
 ## Linting and Code Formatting
 
