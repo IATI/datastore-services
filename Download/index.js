@@ -3,7 +3,7 @@ import { BlobServiceClient } from '@azure/storage-blob';
 import { PassThrough } from 'stream';
 import { query } from '../solr/solr.js';
 import config from '../config/config.js';
-import { parseReadOnlySolrQuery } from '../utils/solrQuery.js';
+import { parseReadOnlySolrQuery, SolrQueryError } from '../utils/solrQuery.js';
 
 const contentTypeMap = {
     JSON: 'application/json',
@@ -54,7 +54,7 @@ export default async function download(context) {
         try {
             solrQuery = parseReadOnlySolrQuery(body.query);
         } catch (error) {
-            if (error?.constructor?.name !== 'SolrQueryError') {
+            if (!(error instanceof SolrQueryError)) {
                 throw error;
             }
             return {
