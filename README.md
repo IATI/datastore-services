@@ -132,7 +132,7 @@ Downloads the provided Solr query to Azure Blobs and returns URL where it can be
 
 - query - solr query: a read-only path of the form `<collection>/select` (or
   `<collection>/search`), optionally followed by `?` and Solr parameters
-- format - JSON, CSV, or XML
+- format - JSON, CSV, XML or EXCEL
 
 The `query` is validated before it is relayed: it must target a `select`/`search`
 handler, so Solr admin handlers (`admin/collections?action=...`) are rejected by
