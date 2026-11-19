@@ -292,8 +292,18 @@ paths:
                             type: object
                             properties:
                                 query:
-                                    description: The Solr query to request for download
+                                    description: >-
+                                        The Solr query to request for download. Must
+                                        target a read-only handler in the form
+                                        `<collection>/select` or `<collection>/search`,
+                                        optionally followed by `?` and Solr parameters.
+                                        Admin handlers (for example
+                                        `admin/collections?action=DELETE`) are rejected
+                                        because the service relays them with its
+                                        privileged Solr credential.
                                     type: string
+                                    maxLength: 8000
+                                    example: 'activity/select?q=reporting_org_ref:"GB-CHC"&fl=iati_identifier,iati_xml'
                                 format:
                                     description: The format to save the download in
                                     type: string
@@ -345,9 +355,9 @@ paths:
                                 type: object
                                 properties:
                                     message:
-                                        type: string  
+                                        type: string
                                     detail:
-                                        type: string  
+                                        type: string
                                     unique_iati_identifiers_found:
                                         description: The number of unique identifiers passed in the list that were found in the Datastore.
                                         type: integer
@@ -356,7 +366,7 @@ paths:
                                         type: integer
                                     num_iati_identifiers_not_found:
                                         description: The number of activities passed in the list that were not found in the Datastore.
-                                        type: integer                                        
+                                        type: integer
                                     iati_identifiers_found:
                                         description: Dictionary of dictionaries of activities found. Key is IATI identifier. Each sub-dictionary contains a 'count' key the value of which is the count of the item in the datastore.
                                         type: object
@@ -368,7 +378,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Error'  
+                                $ref: '#/components/schemas/Error'
                 401:
                     $ref: '#/components/responses/UnauthorizedError'
                 500:
@@ -376,7 +386,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Error'    
+                                $ref: '#/components/schemas/Error'
 
 components:
     responses:

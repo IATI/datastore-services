@@ -171,6 +171,90 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Incorrect Body - admin query path",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+											"",
+											"pm.test(\"Body contains error: admin query path\", function () {",
+											"    pm.expect(statusResponse.output.error).to.eql(\"\\\"query\\\" must target a read-only select/search handler, but \\\"admin/collections\\\" is an admin handler\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"query\": \"admin/collections?action=DELETE\", \"format\": \"JSON\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"orchestrators",
+										"DownloadOrchestrator"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Incorrect Body - non read-only path",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const statusResponse = pm.collectionVariables.get(\"statusResponseBody\");",
+											"",
+											"pm.test(\"Body contains error: non read-only path\", function () {",
+											"    pm.expect(statusResponse.output.error).to.eql(\"\\\"query\\\" must be a read-only path in the form \\\"<collection>/select\\\" or \\\"<collection>/search\\\"\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"query\": \"activity\", \"format\": \"JSON\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/orchestrators/DownloadOrchestrator",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"orchestrators",
+										"DownloadOrchestrator"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"event": [
