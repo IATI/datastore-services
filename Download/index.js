@@ -3,6 +3,7 @@ import { BlobServiceClient } from '@azure/storage-blob';
 import { PassThrough } from 'stream';
 import { query } from '../solr/solr.js';
 import config from '../config/config.js';
+import { parseReadOnlySolrQuery, SolrQueryError } from '../utils/solrQuery.js';
 
 const contentTypeMap = {
     JSON: 'application/json',
@@ -48,7 +49,30 @@ export default async function download(context) {
             };
         }
 
-        const metaURL = new URL(config.SOLRCONFIG.url + body.query);
+        // query must be a read-only handler (select or search)
+        let solrQuery;
+        try {
+            solrQuery = parseReadOnlySolrQuery(body.query);
+        } catch (error) {
+            if (!(error instanceof SolrQueryError)) {
+                throw error;
+            }
+            return {
+                status: 400,
+                error: error.message,
+            };
+        }
+
+        // rebuild the query rather than pasting it, so parameters are encoded
+        const makeQueryUrl = () => {
+            const url = new URL(`${config.SOLRCONFIG.url.replace(/\/+$/, '')}/${solrQuery.path}`);
+            solrQuery.params.forEach((value, key) => {
+                url.searchParams.append(key, value);
+            });
+            return url;
+        };
+
+        const metaURL = makeQueryUrl();
         metaURL.searchParams.set('rows', 0);
         // query solr to get response info (not results yet)
         const { response: solrResponseMeta } = await query(metaURL);
@@ -84,7 +108,7 @@ export default async function download(context) {
             },
         };
         let uploadResponse;
-        const queryUrl = new URL(config.SOLRCONFIG.url + body.query);
+        const queryUrl = makeQueryUrl();
 
         // add sort if not present
         if (!queryUrl.searchParams.has('sort')) {
